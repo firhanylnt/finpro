@@ -33,6 +33,7 @@ model Users {
   fullname     String
   email        String         @unique
   password     String
+  address      String
   status       Boolean        @default(true)
   is_verified  Boolean
   fb_token     String
@@ -226,6 +227,7 @@ model TransactionsDetails {
 model PaymentMethod {
   id           Int            @id @default(autoincrement())
   name         String
+  payment_proof String
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   deletedAt    DateTime?
