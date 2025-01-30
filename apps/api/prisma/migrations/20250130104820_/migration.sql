@@ -19,11 +19,32 @@ CREATE TABLE `Admins` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `deletedAt` DATETIME(3) NULL,
-    `createdBy` INTEGER NOT NULL,
-    `updatedBy` INTEGER NOT NULL,
+    `createdBy` INTEGER NULL,
+    `updatedBy` INTEGER NULL,
     `deletedBy` INTEGER NULL,
 
     UNIQUE INDEX `Admins_email_key`(`email`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `UserAddress` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `phone_number` INTEGER NOT NULL,
+    `is_main_address` BOOLEAN NOT NULL,
+    `lat` VARCHAR(191) NOT NULL,
+    `long` VARCHAR(191) NOT NULL,
+    `city` VARCHAR(191) NOT NULL,
+    `province` VARCHAR(191) NOT NULL,
+    `subdistrict` VARCHAR(191) NOT NULL,
+    `address` VARCHAR(191) NOT NULL,
+    `postal_code` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    `deletedAt` DATETIME(3) NULL,
+
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -33,7 +54,7 @@ CREATE TABLE `Users` (
     `fullname` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
-    `address` VARCHAR(191) NOT NULL,
+    `phone_number` INTEGER NOT NULL,
     `status` BOOLEAN NOT NULL DEFAULT true,
     `is_verified` BOOLEAN NOT NULL,
     `fb_token` VARCHAR(191) NOT NULL,
@@ -41,9 +62,6 @@ CREATE TABLE `Users` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `deletedAt` DATETIME(3) NULL,
-    `createdBy` INTEGER NOT NULL,
-    `updatedBy` INTEGER NOT NULL,
-    `deletedBy` INTEGER NULL,
 
     UNIQUE INDEX `Users_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -57,8 +75,8 @@ CREATE TABLE `Roles` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `deletedAt` DATETIME(3) NULL,
-    `createdBy` INTEGER NOT NULL,
-    `updatedBy` INTEGER NOT NULL,
+    `createdBy` INTEGER NULL,
+    `updatedBy` INTEGER NULL,
     `deletedBy` INTEGER NULL,
 
     UNIQUE INDEX `Roles_name_key`(`name`),
@@ -215,12 +233,15 @@ CREATE TABLE `Transactions` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(191) NOT NULL,
     `user_id` INTEGER NOT NULL,
+    `address_id` INTEGER NOT NULL,
     `amount` DECIMAL(65, 30) NOT NULL,
     `discount` DECIMAL(65, 30) NOT NULL,
     `tax` DECIMAL(65, 30) NOT NULL,
     `admin_fee` DECIMAL(65, 30) NOT NULL,
+    `shipping_cost` DECIMAL(65, 30) NOT NULL,
     `gross_amount` DECIMAL(65, 30) NOT NULL,
     `payment_method_id` INTEGER NOT NULL,
+    `payment_proof` VARCHAR(191) NULL,
     `status` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
@@ -247,7 +268,6 @@ CREATE TABLE `TransactionsDetails` (
 CREATE TABLE `PaymentMethod` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `payment_proof` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `deletedAt` DATETIME(3) NULL,
@@ -258,23 +278,14 @@ CREATE TABLE `PaymentMethod` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
-CREATE TABLE `Sample` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(191) NOT NULL,
-    `code` VARCHAR(191) NOT NULL,
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
-
-    UNIQUE INDEX `Sample_code_key`(`code`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 -- AddForeignKey
 ALTER TABLE `Admins` ADD CONSTRAINT `Admins_role_id_fkey` FOREIGN KEY (`role_id`) REFERENCES `Roles`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Admins` ADD CONSTRAINT `Admins_store_id_fkey` FOREIGN KEY (`store_id`) REFERENCES `Stores`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `UserAddress` ADD CONSTRAINT `UserAddress_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `Users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Products` ADD CONSTRAINT `Products_product_category_id_fkey` FOREIGN KEY (`product_category_id`) REFERENCES `ProductCategory`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
