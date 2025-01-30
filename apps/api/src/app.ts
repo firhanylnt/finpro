@@ -8,8 +8,12 @@ import express, {
   Router,
 } from 'express';
 import cors from 'cors';
-import { PORT } from './config';
-import { SampleRouter } from './routers/sample.router';
+import { PORT, WEB_URL } from './config';
+import { AuthRouter } from './routers/auth.route';
+import { UsersRouter } from './routers/users.route';
+
+import helmet from "helmet";
+import ErrorMiddleware from "./middlewares/errorMiddleware";
 
 export default class App {
   private app: Express;
@@ -17,47 +21,31 @@ export default class App {
   constructor() {
     this.app = express();
     this.configure();
-    this.routes();
-    this.handleError();
+    
   }
 
   private configure(): void {
-    this.app.use(cors());
+    this.app.use(cors({
+      origin: WEB_URL || 'http://localhost:3000',
+      credentials: true,
+    }));
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
-  }
-
-  private handleError(): void {
-    // not found
-    this.app.use((req: Request, res: Response, next: NextFunction) => {
-      if (req.path.includes('/api/')) {
-        res.status(404).send('Not found !');
-      } else {
-        next();
-      }
-    });
-
-    // error
-    this.app.use(
-      (err: Error, req: Request, res: Response, next: NextFunction) => {
-        if (req.path.includes('/api/')) {
-          console.error('Error : ', err.stack);
-          res.status(500).send('Error !');
-        } else {
-          next();
-        }
-      },
-    );
+    this.app.use(helmet());
+    this.routes();
+    this.app.use(ErrorMiddleware);
   }
 
   private routes(): void {
-    const sampleRouter = new SampleRouter();
-
+    const authRouter = new AuthRouter();
+    const usersRouter = new UsersRouter();
+    
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
 
-    this.app.use('/api/samples', sampleRouter.getRouter());
+    this.app.use('/api/auth', authRouter.getRouter());
+    this.app.use('/api/users', usersRouter.getRouter());
   }
 
   public start(): void {

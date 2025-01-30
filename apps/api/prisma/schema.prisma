@@ -21,11 +21,30 @@ model Admins {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  createdBy Int
-  updatedBy Int
+  createdBy Int?
+  updatedBy Int?
   deletedBy Int?
   roles     Roles     @relation(fields: [role_id], references: [id])
   store     Stores?   @relation(fields: [store_id], references: [id])
+}
+
+model UserAddress {
+  id              Int       @id @default(autoincrement())
+  user_id         Int
+  name            String
+  phone_number    Int
+  is_main_address Boolean
+  lat             String
+  long            String
+  city            String
+  province        String
+  subdistrict     String
+  address         String
+  postal_code     Int
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+  users           Users     @relation(fields: [user_id], references: [id])
 }
 
 model Users {
@@ -33,7 +52,7 @@ model Users {
   fullname     String
   email        String         @unique
   password     String
-  address      String
+  phone_number Int
   status       Boolean        @default(true)
   is_verified  Boolean
   fb_token     String
@@ -41,11 +60,9 @@ model Users {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   deletedAt    DateTime?
-  createdBy    Int
-  updatedBy    Int
-  deletedBy    Int?
   Cart         Cart[]
   Transactions Transactions[]
+  address      UserAddress[]
 }
 
 model Roles {
@@ -55,8 +72,8 @@ model Roles {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
-  createdBy   Int
-  updatedBy   Int
+  createdBy   Int?
+  updatedBy   Int?
   deletedBy   Int?
   admin       Admins[]
 }
@@ -196,12 +213,15 @@ model Transactions {
   id                  Int                   @id @default(autoincrement())
   code                String
   user_id             Int
+  address_id          Int
   amount              Decimal
   discount            Decimal
   tax                 Decimal
   admin_fee           Decimal
+  shipping_cost       Decimal
   gross_amount        Decimal
   payment_method_id   Int
+  payment_proof       String?
   status              Int
   createdAt           DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
@@ -227,7 +247,6 @@ model TransactionsDetails {
 model PaymentMethod {
   id           Int            @id @default(autoincrement())
   name         String
-  payment_proof String
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   deletedAt    DateTime?
@@ -235,13 +254,4 @@ model PaymentMethod {
   updatedBy    Int
   deletedBy    Int?
   Transactions Transactions[]
-}
-
-model Sample {
-  id        Int      @id @default(autoincrement())
-  name      String
-  code      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  // @@map("samples") // if you want to use snake_case format
 }
