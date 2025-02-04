@@ -123,7 +123,7 @@ model ProductCategory {
   updatedAt   DateTime   @updatedAt
   deletedAt   DateTime?
   createdBy   Int
-  updatedBy   Int
+  updatedBy   Int?
   deletedBy   Int?
   products    Products[]
 }

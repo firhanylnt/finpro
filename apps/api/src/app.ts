@@ -11,9 +11,13 @@ import cors from 'cors';
 import { PORT, WEB_URL } from './config';
 import { AuthRouter } from './routers/auth.route';
 import { UsersRouter } from './routers/users.route';
+import { ProductRouter } from './routers/product.route';
+import { ProductCategoryRouter } from './routers/productCategory.route';
 
 import helmet from "helmet";
 import ErrorMiddleware from "./middlewares/errorMiddleware";
+import { DiscountRouter } from './routers/discount.route';
+import { StockRouter } from './routers/stock.route';
 
 export default class App {
   private app: Express;
@@ -39,6 +43,10 @@ export default class App {
   private routes(): void {
     const authRouter = new AuthRouter();
     const usersRouter = new UsersRouter();
+    const productRouter = new ProductRouter();
+    const productCategoryRouter = new ProductCategoryRouter();
+    const discountRouter = new DiscountRouter();
+    const stockRouter = new StockRouter();
     
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -46,6 +54,10 @@ export default class App {
 
     this.app.use('/api/auth', authRouter.getRouter());
     this.app.use('/api/users', usersRouter.getRouter());
+    this.app.use('/api/product', productRouter.getRouter());
+    this.app.use('/api/product-category', productCategoryRouter.getRouter());
+    this.app.use('/api/discount', discountRouter.getRouter());
+    this.app.use('/api/stock', stockRouter.getRouter());
   }
 
   public start(): void {

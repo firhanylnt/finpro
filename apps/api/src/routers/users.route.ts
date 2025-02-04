@@ -15,11 +15,11 @@ export class UsersRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.get('/', VerifyToken, AdminGuard ,this.usersController.getAllAdmin);
-    this.router.get('/:id', VerifyToken, AdminGuard,this.usersController.getAdminById);
-    this.router.post('/create', RegisterValidation, this.usersController.createAdmin);
-    this.router.patch('/update/:id', RegisterValidation, this.usersController.updateAdmin);
-    this.router.delete('/delete/:id', RegisterValidation, this.usersController.deleteAdmin);
+    this.router.get('/', VerifyToken, AdminGuard ,this.usersController.getAll);
+    this.router.get('/:id', VerifyToken, AdminGuard,this.usersController.getById);
+    this.router.post('/create', VerifyToken, AdminGuard, RegisterValidation, this.usersController.create);
+    this.router.patch('/update/:id', VerifyToken, AdminGuard, this.usersController.update);
+    this.router.delete('/delete/:id', VerifyToken, AdminGuard, this.usersController.delete);
   }
 
   getRouter(): Router {

@@ -129,7 +129,7 @@ CREATE TABLE `ProductCategory` (
     `updatedAt` DATETIME(3) NOT NULL,
     `deletedAt` DATETIME(3) NULL,
     `createdBy` INTEGER NOT NULL,
-    `updatedBy` INTEGER NOT NULL,
+    `updatedBy` INTEGER NULL,
     `deletedBy` INTEGER NULL,
 
     UNIQUE INDEX `ProductCategory_name_key`(`name`),
