@@ -1,16 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
-import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../../config';
 import { genSalt, hash, compare } from "bcrypt";
 const prisma = new PrismaClient();
 
 export class UsersController {
-    constructor() {
-        this.createAdmin = this.createAdmin.bind(this);
-    }
-
-    async createAdmin(req: Request, res: Response, next: NextFunction) {
+    async create(req: Request, res: Response, next: NextFunction) {
         try {
             const { fullname, email, password, role_id, store_id, status, created_by } = req.body;
             const checkAdmin = await prisma.admins.findUnique({
@@ -56,7 +50,7 @@ export class UsersController {
         }
     }
 
-    async updateAdmin(req: Request, res: Response, next: NextFunction) {
+    async update(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
             const { fullname, email, password, role_id, status, store_id, updated_by } = req.body;
@@ -104,7 +98,7 @@ export class UsersController {
         }
     }
 
-    async getAllAdmin(req: Request, res: Response, next: NextFunction) {
+    async getAll(req: Request, res: Response, next: NextFunction) {
         try {
             interface IFilter {
                 keyword?: string;
@@ -112,12 +106,26 @@ export class UsersController {
                 pageSize: number;
             }
 
-            const { page, pageSize } = req.query;
+            const { keyword, page, pageSize } = req.query;
 
             const filter: IFilter = {
+                keyword: keyword ? String(keyword) : '',    
                 page: parseInt(page as string) || 1,
                 pageSize: parseInt(pageSize as string) || 10,
             };
+
+            const whereCondition: any = {
+                AND: [{ deletedAt: null }],
+            };
+
+            if (filter.keyword) {
+                whereCondition.OR = [
+                    { fullname: { contains: filter.keyword } },
+                    { email: { contains: filter.keyword } },
+                    { store: { name: { contains: filter.keyword } } },
+                    { roles: { name: { contains: filter.keyword } } },
+                ];
+            }
 
             const data = await prisma.admins.findMany({
                 select: {
@@ -125,17 +133,7 @@ export class UsersController {
                     roles: true,
                     store: true,
                 },
-                where: {
-                    OR: [
-                        { fullname: { contains: filter.keyword } },
-                        { email: { contains: filter.keyword } },
-                        { store: { name: { contains: filter.keyword } } },
-                        { roles: { name: { contains: filter.keyword } } },
-                    ],
-                    AND: [
-                        { deletedAt: null }
-                    ],
-                },
+                where: whereCondition,
                 skip: filter.page != 1 ? (filter.page - 1) * filter.pageSize : 0,
                 take: filter.pageSize,
             })
@@ -149,7 +147,7 @@ export class UsersController {
         }
     }
 
-    async getAdminById(req: Request, res: Response, next: NextFunction) {
+    async getById(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params;
 
         const admin = await prisma.admins.findUnique({
@@ -164,7 +162,7 @@ export class UsersController {
         })
     }
 
-    async deleteAdmin(req: Request, res: Response, next: NextFunction) {
+    async delete(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params;
 
         const admin = await prisma.admins.findUnique({
@@ -173,9 +171,14 @@ export class UsersController {
 
         if (!admin) throw new Error("admin Tidak Terdaftar");
 
+        await prisma.admins.delete({
+            where: {
+                id: Number(id)
+            }
+        })
+
         res.status(200).send({
-            message: 'Get Admin By Id',
-            data: admin,
+            message: 'Admin berhasil dihapus',
         })
     }
 }
