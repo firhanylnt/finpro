@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { VscArrowLeft } from "react-icons/vsc";
 import { FaRegHeart } from "react-icons/fa";
+import { IoBagCheckOutline } from "react-icons/io5";
 
 export default function CartPage() {
   return (
@@ -15,6 +16,18 @@ export default function CartPage() {
             className="text-4xl"
           >
             <VscArrowLeft />
+          </Link>
+        </button>
+      </div>
+      <div className="fixed bottom-4 left-56 p-3 text-sm md:pb-3">
+        <button aria-label="checkoutmenu" className="text-4xl shadow-md">
+          <Link
+            aria-label="button-checkout"
+            href="/checkout"
+            rel="noopener noreferrer"
+            className="text-4xl"
+          >
+            <IoBagCheckOutline />
           </Link>
         </button>
       </div>

@@ -5,7 +5,14 @@ import { IoCartOutline } from "react-icons/io5";
 export default function ProductPage() {
   return (
     <>
-      <div className="mt-4 px-6">Daftar Produk</div>
+      <div className="mb-4 mt-4 px-6">
+        Daftar Produk
+        <div className="grid">
+          <Link href="/product/telur" className="mt-8">
+            Telur
+          </Link>
+        </div>
+      </div>
       <div className="fixed bottom-4 left-4 p-3 text-sm md:pb-3">
         <button aria-label="cartmenu" className="text-4xl shadow-md">
           <Link
