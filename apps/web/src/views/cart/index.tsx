@@ -1,12 +1,12 @@
-import Link from "next/link";
-import { VscArrowLeft } from "react-icons/vsc";
-import { FaRegHeart } from "react-icons/fa";
-import { IoBagCheckOutline } from "react-icons/io5";
+// import Link from "next/link";
+// import { VscArrowLeft } from "react-icons/vsc";
+// import { FaRegHeart } from "react-icons/fa";
+// import { IoBagCheckOutline } from "react-icons/io5";
 
 export default function CartPage() {
   return (
     <>
-      <div className="mt-4 px-6">Keranjang</div>
+      {/* <div className="mt-4 px-6">Keranjang</div>
       <div className="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
         <div className="mx-auto w-full flex-none px-4 lg:max-w-2xl xl:max-w-4xl">
           <div className="space-y-6">
@@ -184,7 +184,7 @@ export default function CartPage() {
             <FaRegHeart />
           </Link>
         </button>
-      </div>
+      </div> */}
     </>
   );
 }
