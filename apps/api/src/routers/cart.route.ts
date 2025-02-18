@@ -4,21 +4,21 @@ import { Router } from 'express';
 
 export class CartRouter {
   private router: Router;
-  private cart: CartController;
+  private cartController: CartController;
 
   constructor() {
-    this.cart = new CartController();
+    this.cartController = new CartController();
     this.router = Router();
     this.initializeRoutes();
   }
 
   private initializeRoutes(): void {
-    // this.router.get('/cart', VerifyToken, AdminGuard, this.cart.getAll);
-    // this.router.get('/cart', VerifyToken, AdminGuard, this.cart.getList);
-    // this.router.get('/cart/:id', VerifyToken, AdminGuard, this.cart.getById);
-    // this.router.post('/cart', VerifyToken, AdminGuard, this.cart.create);
-    // this.router.patch('/cart/:id', VerifyToken, AdminGuard, this.cart.update);
-    // this.router.delete('/cart/:id', VerifyToken, AdminGuard, this.cart.delete);
+    // this.router.get('/cart', VerifyToken, AdminGuard, this.cartController.getAll);
+    // this.router.get('/cart', VerifyToken, AdminGuard, this.cartController.getList);
+    // this.router.get('/cart/:id', VerifyToken, AdminGuard, this.cartController.getById);
+    // this.router.post('/cart', VerifyToken, AdminGuard, this.cartController.create);
+    // this.router.patch('/cart/:id', VerifyToken, AdminGuard, this.cartController.update);
+    // this.router.delete('/cart/:id', VerifyToken, AdminGuard, this.cartController.delete);
   }
 
   getRouter(): Router {
