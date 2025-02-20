@@ -1,11 +1,5 @@
-import ManagePage from '@/views/product/manage';
+import ManagePage from "@/views/product/manage";
 
 export default function ManageViews() {
-  return (
-    <>
-      <div>
-        <ManagePage />
-      </div>
-    </>
-  );
+  return <ManagePage />;
 }

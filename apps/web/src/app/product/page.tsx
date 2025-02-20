@@ -1,11 +1,5 @@
-import ProductPage from '@/views/product';
+import ProductPage from "@/views/product";
 
 export default function ProductViews() {
-  return (
-    <>
-      <div>
-        <ProductPage />
-      </div>
-    </>
-  );
+  return <ProductPage />;
 }

@@ -1,12 +1,13 @@
-// import Link from "next/link";
-// import { VscArrowLeft } from "react-icons/vsc";
-// import { FaRegHeart } from "react-icons/fa";
-// import { IoBagCheckOutline } from "react-icons/io5";
+import Link from "next/link";
+import { VscArrowLeft } from "react-icons/vsc";
+import { FaRegHeart } from "react-icons/fa";
+import { IoBagCheckOutline } from "react-icons/io5";
+import { Plus, Minus, Heart, Trash } from "lucide-react";
 
 export default function CartPage() {
   return (
     <>
-      {/* <div className="mt-4 px-6">Keranjang</div>
+      <div className="mt-4 px-6 font-bold">Keranjang</div>
       <div className="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
         <div className="mx-auto w-full flex-none px-4 lg:max-w-2xl xl:max-w-4xl">
           <div className="space-y-6">
@@ -16,12 +17,12 @@ export default function CartPage() {
                   <img
                     className="h-20 w-20 rounded-md border-4 dark:hidden"
                     src="https://images.tokopedia.net/img/cache/500-square/product-1/2020/3/21/24352824/24352824_a75f7a13-18de-41e2-b2e7-73ff69e4df80_500_500.webp?ect=3g"
-                    alt="imac image"
+                    alt="telur image"
                   />
                   <img
                     className="hidden h-20 w-20 rounded-md border-4 dark:block"
                     src="https://images.tokopedia.net/img/cache/500-square/product-1/2020/3/21/24352824/24352824_a75f7a13-18de-41e2-b2e7-73ff69e4df80_500_500.webp?ect=3g"
-                    alt="imac image"
+                    alt="telur image"
                   />
                 </a>
                 <div className="flex items-center justify-between md:order-3 md:justify-end">
@@ -30,23 +31,9 @@ export default function CartPage() {
                       type="button"
                       id="decrement-button"
                       data-input-counter-decrement="counter-input"
-                      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-200 dark:hover:bg-gray-100 dark:focus:ring-gray-400"
                     >
-                      <svg
-                        className="h-2.5 w-2.5 text-gray-900 dark:text-white"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 18 2"
-                      >
-                        <path
-                          stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M1 1h16"
-                        />
-                      </svg>
+                      <Minus color="green" size={48} />
                     </button>
                     <input
                       type="text"
@@ -61,23 +48,9 @@ export default function CartPage() {
                       type="button"
                       id="increment-button"
                       data-input-counter-increment="counter-input"
-                      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-200 dark:hover:bg-gray-100 dark:focus:ring-gray-400"
                     >
-                      <svg
-                        className="h-2.5 w-2.5 text-gray-900 dark:text-white"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 18 18"
-                      >
-                        <path
-                          stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 1v16M1 9h16"
-                        />
-                      </svg>
+                      <Plus color="green" size={48} />
                     </button>
                   </div>
                   <div className="text-end md:order-4 md:w-32">
@@ -101,46 +74,14 @@ export default function CartPage() {
                       type="button"
                       className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-white"
                     >
-                      <svg
-                        className="me-1.5 h-5 w-5"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12.01 6.001C6.5 1 1 8 5.782 13.001L12.011 20l6.23-7C23 8 17.5 1 12.01 6.002Z"
-                        />
-                      </svg>
+                      <Heart color="grey" size={20} />
                     </button>
 
                     <button
                       type="button"
                       className="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500"
                     >
-                      <svg
-                        className="me-1.5 h-5 w-5"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M6 18 17.94 6M18 18 6.06 6"
-                        />
-                      </svg>
+                      <Trash color="red" size={20} />
                     </button>
                   </div>
                 </div>
@@ -165,7 +106,7 @@ export default function CartPage() {
         <button aria-label="checkoutmenu" className="text-4xl shadow-md">
           <Link
             aria-label="button-checkout"
-            href="/checkout"
+            href="/cart/checkout"
             rel="noopener noreferrer"
             className="text-4xl"
           >
@@ -184,7 +125,7 @@ export default function CartPage() {
             <FaRegHeart />
           </Link>
         </button>
-      </div> */}
+      </div>
     </>
   );
 }

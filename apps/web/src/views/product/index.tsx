@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { VscSettingsGear } from "react-icons/vsc";
 import { IoCartOutline } from "react-icons/io5";
+import { Home } from "lucide-react";
 
 export default function ProductPage() {
   return (
     <>
-      <div className="mb-4 mt-4 px-6">
+      <div className="mb-4 mt-4 px-6 font-bold">
         Daftar Produk
-        <div className="grid">
+        <div className="grid font-normal">
           <Link href="/product/telur" className="mt-8">
             Telur
           </Link>
@@ -22,6 +23,18 @@ export default function ProductPage() {
             className="text-4xl"
           >
             <IoCartOutline />
+          </Link>
+        </button>
+      </div>
+      <div className="fixed bottom-4 left-40 p-3 text-sm md:pb-3">
+        <button aria-label="checkoutmenu" className="text-4xl shadow-md">
+          <Link
+            aria-label="button-checkout"
+            href="/"
+            rel="noopener noreferrer"
+            className="text-4xl"
+          >
+            <Home size={34} />
           </Link>
         </button>
       </div>
