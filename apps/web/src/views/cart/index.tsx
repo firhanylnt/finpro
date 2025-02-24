@@ -13,18 +13,10 @@ export default function CartPage() {
           <div className="space-y-6">
             <div className="rounded-lg border border-gray-200 p-4 shadow-sm md:p-6 dark:border-gray-700">
               <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
-                <a href="#" className="shrink-0 md:order-1">
-                  <img
-                    className="h-20 w-20 rounded-md border-4 dark:hidden"
-                    src="https://images.tokopedia.net/img/cache/500-square/product-1/2020/3/21/24352824/24352824_a75f7a13-18de-41e2-b2e7-73ff69e4df80_500_500.webp?ect=3g"
-                    alt="telur image"
-                  />
-                  <img
-                    className="hidden h-20 w-20 rounded-md border-4 dark:block"
-                    src="https://images.tokopedia.net/img/cache/500-square/product-1/2020/3/21/24352824/24352824_a75f7a13-18de-41e2-b2e7-73ff69e4df80_500_500.webp?ect=3g"
-                    alt="telur image"
-                  />
-                </a>
+                <div className="shrink-0 md:order-1">
+                  <div className="h-20 w-20 rounded-md border-4 dark:hidden"></div>
+                  <div className="hidden h-20 w-20 rounded-md border-4 dark:block"></div>
+                </div>
                 <div className="flex items-center justify-between md:order-3 md:justify-end">
                   <div className="flex items-center">
                     <button
