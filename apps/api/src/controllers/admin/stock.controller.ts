@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
-import { genSalt, hash, compare } from "bcrypt";
+import { AuthenticatedRequest } from "@/custom";
 const prisma = new PrismaClient();
 
 export class StockController {
 
-    async create(req: Request, res: Response, next: NextFunction) {
+    async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const { product_id, store_id, type, qty, created_by } = req.body;
+            const { product_id, store_id, type, qty } = req.body;
             const checkExist = await prisma.stock.findFirst({
                 where: { product_id: Number(product_id), store_id: Number(store_id) },
             });
@@ -26,8 +26,8 @@ export class StockController {
                             type: type,
                             qty: qty,
                             status: true,
-                            createdBy: created_by,
-                            updatedBy: created_by,
+                            createdBy: req.admin?.id,
+                            updatedBy: req.admin?.id,
                         }
                     });
 
@@ -45,8 +45,8 @@ export class StockController {
                             product_id: product_id,
                             store_id: store_id,
                             qty: qty,
-                            createdBy: created_by,
-                            updatedBy: created_by,
+                            createdBy: req.admin?.id,
+                            updatedBy: req.admin?.id,
                         },
                     });
 
@@ -56,8 +56,8 @@ export class StockController {
                             type: type,
                             qty: qty,
                             status: true,
-                            createdBy: created_by,
-                            updatedBy: created_by,
+                            createdBy: req.admin?.id,
+                            updatedBy: req.admin?.id,
                         }
                     });
 
@@ -73,10 +73,10 @@ export class StockController {
         }
     }
 
-    async update(req: Request, res: Response, next: NextFunction) {
+    async update(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
-            const { product_id, store_id, type, qty, created_by } = req.body;
+            const { product_id, store_id, type, qty } = req.body;
             const checkExist = await prisma.stock.findFirst({
                 where: { id: Number(id) },
             });
@@ -95,8 +95,8 @@ export class StockController {
                     type: type,
                     qty: qty,
                     status: true,
-                    createdBy: created_by,
-                    updatedBy: created_by,
+                    createdBy: req.admin?.id,
+                    updatedBy: req.admin?.id,
                 }
             });
 

@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
-import { genSalt, hash, compare } from "bcrypt";
+import { AuthenticatedRequest } from "@/custom";
 const prisma = new PrismaClient();
 
 export class ProductCategoryController {
 
-    async create(req: Request, res: Response, next: NextFunction) {
+    async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const { name, description, created_by } = req.body;
+            const { name, description } = req.body;
             const checkExist = await prisma.productCategory.findUnique({
                 where: { name },
             });
@@ -19,7 +19,7 @@ export class ProductCategoryController {
                     data: {
                         name: name,
                         description: description,
-                        createdBy: created_by,
+                        createdBy: req.admin?.id,
                     },
                 });
             });
@@ -32,13 +32,13 @@ export class ProductCategoryController {
         }
     }
 
-    async update(req: Request, res: Response, next: NextFunction) {
+    async update(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
-            const { name, description, updated_by } = req.body;
+            const { name, description } = req.body;
 
             const checkExist = await prisma.productCategory.findUnique({
-                where: { name },
+                where: { id: Number(id) },
             });
 
             if (!checkExist) throw new Error("Category Tidak Terdaftar");
@@ -48,17 +48,21 @@ export class ProductCategoryController {
                 data: {
                     name: name,
                     description: description,
-                    updatedBy: updated_by,
+                    updatedBy: req.admin?.id,
                     updatedAt: new Date(),
                 },
-            })
+            });
+
+            res.status(200).send({
+                message: 'Success update Category',
+            });
 
         } catch (error) {
             next(error);
         }
     }
 
-    async getList(req: Request, res: Response, next: NextFunction) {
+    async getList(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             const category = await prisma.productCategory.findMany({
                 select: {
@@ -76,36 +80,44 @@ export class ProductCategoryController {
         }
     }
 
-    async getAll(req: Request, res: Response, next: NextFunction) {
+    async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             interface IFilter {
-                keyword?: string;
+                search?: string;
+                sortBy?: string;
+                sortOrder?: string;
                 page: number;
-                pageSize: number;
             }
-
-            const { keyword, page, pageSize } = req.query;
-
+        
+            const { search, sortBy, sortOrder, page } = req.query;
+        
             const filter: IFilter = {
-                keyword: keyword ? String(keyword) : '',
+                search: search ? String(search) : "",
+                sortBy: sortBy ? String(sortBy) : "name",
+                sortOrder: sortOrder === "desc" ? "desc" : "asc",
                 page: parseInt(page as string) || 1,
-                pageSize: parseInt(pageSize as string) || 10,
             };
+
+            const orderBy: Record<string, "asc" | "desc"> = {};
+            if (filter.sortBy) {
+                orderBy[filter.sortBy] = filter.sortOrder === "desc" ? "desc" : "asc";
+            }
 
             const data = await prisma.productCategory.findMany({
                 select: {
-                    name: true, description: true,
+                    id: true, name: true, description: true,
                 },
                 where: {
                     OR: [
-                        { name: { contains: filter.keyword } },
+                        { name: { contains: filter.search } },
                     ],
                     AND: [
                         { deletedAt: null }
                     ],
                 },
-                skip: filter.page != 1 ? (filter.page - 1) * filter.pageSize : 0,
-                take: filter.pageSize,
+                orderBy,
+                skip: filter.page != 1 ? (filter.page - 1) * 10 : 0,
+                take: 10,
             })
 
             res.status(200).send({
@@ -117,7 +129,7 @@ export class ProductCategoryController {
         }
     }
 
-    async getById(req: Request, res: Response, next: NextFunction) {
+    async getById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         const { id } = req.params;
 
         const category = await prisma.productCategory.findUnique({
@@ -132,7 +144,7 @@ export class ProductCategoryController {
         })
     }
 
-    async delete(req: Request, res: Response, next: NextFunction) {
+    async delete(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         const { id } = req.params;
 
         const category = await prisma.productCategory.findUnique({
@@ -141,10 +153,9 @@ export class ProductCategoryController {
 
         if (!category) throw new Error("Category Tidak Terdaftar");
 
-        await prisma.productCategory.delete({
-            where: {
-                id: Number(id)
-            }
+        await prisma.productCategory.update({
+            where: { id: Number(id) },
+            data: { deletedAt: new Date() }
         })
 
         res.status(200).send({
