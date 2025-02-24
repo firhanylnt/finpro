@@ -1,32 +1,49 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
+import { AuthenticatedRequest } from "@/custom";
+import cloudinary from '@/cloudinary';
 const prisma = new PrismaClient();
 
 export class ProductController {
 
-    async create(req: Request, res: Response, next: NextFunction) {
+    async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             const { name, product_category_id, description, price, status, created_by } = req.body;
+
+            console.log(req.body);
             const checkExist = await prisma.products.findUnique({
-                where: { name },
+                where: { name: String(name) },
             });
 
             if (checkExist) throw new Error("Product sudah terdaftar");
 
             await prisma.$transaction(async (prisma) => {
-                await prisma.products.create({
+                const product = await prisma.products.create({
                     data: {
                         name: name,
-                        product_category_id: product_category_id,
+                        product_category_id: Number(product_category_id),
                         description: description,
                         price: price,
-                        status: status,
-                        createdBy: created_by,
-                        updatedBy: created_by,
+                        status: status === 'true' ? true : false,
+                        createdBy: req.admin?.id,
+                        updatedBy: req.admin?.id,
                     },
                 });
-
-                // add images here
+                const files = req.files as Express.Multer.File[];
+                const imageUploads = await Promise.all(
+                    files.map(async (file) => {
+                        const result = await cloudinary.uploader.upload(file.path, {
+                            folder: 'products',
+                        });
+                        return prisma.productImages.create({
+                            data: {
+                                product_id: product.id,
+                                image_name: file.filename,
+                                image_url: result.secure_url,
+                            },
+                        });
+                    })
+                );
             });
 
             res.status(200).send({
@@ -37,7 +54,7 @@ export class ProductController {
         }
     }
 
-    async update(req: Request, res: Response, next: NextFunction) {
+    async update(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
             const { name, product_category_id, description, price, status, updated_by } = req.body;
@@ -56,7 +73,7 @@ export class ProductController {
                     description: description,
                     price: price,
                     status: status,
-                    updatedBy: updated_by,
+                    updatedBy: req.admin?.id,
                     updatedAt: new Date(),
                 },
             });
@@ -66,15 +83,15 @@ export class ProductController {
         }
     }
 
-    async getList(req: Request, res: Response, next: NextFunction) {
+    async getList(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             const product = await prisma.products.findMany({
                 select: {
                     id: true, name: true
                 },
-                orderBy: {name: 'asc'}
+                orderBy: { name: 'asc' }
             });
-    
+
             res.status(200).send({
                 message: 'Get Products',
                 data: product,
@@ -84,60 +101,55 @@ export class ProductController {
         }
     }
 
-    async getAll(req: Request, res: Response, next: NextFunction) {
+    async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             interface IFilter {
-                storeId: number;
-                keyword?: string;
-                category?: string;
-                status?: string;
+                search?: string;
+                sortBy?: string;
+                sortOrder?: string;
                 page: number;
-                pageSize: number;
             }
-
-            const { storeId, keyword, category, status, page, pageSize } = req.query;
-
+        
+            const { search, sortBy, sortOrder, page } = req.query;
+        
             const filter: IFilter = {
-                storeId: Number(storeId),
-                keyword: keyword ? String(keyword) : '',
-                category: category ? String(category) : '',
-                status: status ? String(status) : '',
+                search: search ? String(search) : "",
+                sortBy: sortBy ? String(sortBy) : "name",
+                sortOrder: sortOrder === "desc" ? "desc" : "asc",
                 page: parseInt(page as string) || 1,
-                pageSize: parseInt(pageSize as string) || 10,
             };
 
             const whereCondition: any = {
                 AND: [
                     { deletedAt: null },
-                    { stock: { store_id : storeId}}
                 ],
             };
-            
-            if (filter.keyword) {
+
+            if (filter.search) {
                 whereCondition.OR = [
-                    { name: { contains: filter.keyword } },
-                    { productcategory: { name: { contains: filter.keyword } } }
+                    { name: { contains: filter.search, mode: "insensitive" } },
+                    { productcategory: { name: { contains: filter.search, mode: "insensitive" } } }
                 ];
             }
-            
-            if (filter.status !== undefined && filter.status !== '') {
-                whereCondition.status = filter.status === 'true' ? true : false;
+
+            const orderBy: Record<string, "asc" | "desc"> = {};
+            if (filter.sortBy) {
+                orderBy[filter.sortBy] = filter.sortOrder === "desc" ? "desc" : "asc";
             }
 
             const data = await prisma.products.findMany({
                 select: {
-                    name: true, price: true, description: true, status: true,
+                    id: true, name: true, price: true, description: true, status: true, createdAt: true,
                     productcategory: true,
-                    stock: true,
                 },
                 where: whereCondition,
-                orderBy: {id : 'desc'},
-                skip: filter.page != 1 ? (filter.page - 1) * filter.pageSize : 0,
-                take: filter.pageSize,
-            })
+                orderBy,
+                skip: filter.page != 1 ? (filter.page - 1) * 10 : 0,
+                take: 10,
+            });
 
             res.status(200).send({
-                message: 'Get All Category',
+                message: 'Get All Product',
                 data
             })
         } catch (error) {
@@ -145,7 +157,7 @@ export class ProductController {
         }
     }
 
-    async getById(req: Request, res: Response, next: NextFunction) {
+    async getById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         const { id } = req.params;
 
         const category = await prisma.products.findUnique({
@@ -160,7 +172,7 @@ export class ProductController {
         })
     }
 
-    async delete(req: Request, res: Response, next: NextFunction) {
+    async delete(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         const { id } = req.params;
 
         const category = await prisma.products.findUnique({

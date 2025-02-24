@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from "express";
+import { AuthenticatedRequest } from "@/custom";
 import { PrismaClient } from "@prisma/client";
 import { genSalt, hash, compare } from "bcrypt";
 const prisma = new PrismaClient();
 
 export class DiscountController {
 
-    async create(req: Request, res: Response, next: NextFunction) {
+    async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const { name, discount_type_id, start_date, end_date, status, created_by } = req.body;
+            const { name, discount_type_id, start_date, end_date, status } = req.body;
 
             await prisma.$transaction(async (prisma) => {
                 await prisma.discount.create({
@@ -17,8 +18,7 @@ export class DiscountController {
                         start_date: start_date,
                         end_date: end_date,
                         status: status,
-                        createdBy: created_by,
-                        updatedBy: created_by,
+                        createdBy: req.admin?.id,
                     },
                 });
             });
@@ -31,7 +31,7 @@ export class DiscountController {
         }
     }
 
-    async update(req: Request, res: Response, next: NextFunction) {
+    async update(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
             const { name, discount_type_id, start_date, end_date, status, updated_by } = req.body;
@@ -50,7 +50,7 @@ export class DiscountController {
                     start_date: start_date,
                     end_date: end_date,
                     status: status,
-                    updatedBy: updated_by,
+                    updatedBy: req.admin?.id,
                     updatedAt: new Date(),
                 },
             })
@@ -60,7 +60,7 @@ export class DiscountController {
         }
     }
 
-    async getList(req: Request, res: Response, next: NextFunction) {
+    async getList(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             const category = await prisma.discount.findMany({
                 select: {
@@ -78,7 +78,7 @@ export class DiscountController {
         }
     }
 
-    async getAll(req: Request, res: Response, next: NextFunction) {
+    async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             interface IFilter {
                 keyword?: string;
@@ -120,7 +120,7 @@ export class DiscountController {
         }
     }
 
-    async getById(req: Request, res: Response, next: NextFunction) {
+    async getById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         const { id } = req.params;
 
         const category = await prisma.discount.findUnique({
@@ -135,7 +135,7 @@ export class DiscountController {
         })
     }
 
-    async delete(req: Request, res: Response, next: NextFunction) {
+    async delete(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         const { id } = req.params;
 
         const category = await prisma.discount.findUnique({

@@ -18,9 +18,9 @@ export class AuthController {
             if (!isPasswordValid) throw new Error("Password salah");
 
             const token = jwt.sign(
-                { email: admin.email, role: admin.role_id, name: admin.fullname, store: admin.store_id },
+                { id: admin.id, email: admin.email, role: admin.role_id, name: admin.fullname, store: admin.store_id },
                 JWT_SECRET,
-                { expiresIn: '1h' }
+                { expiresIn: '7d' }
             );
 
             res.status(200).cookie("access_token", token).send({

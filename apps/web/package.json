@@ -10,6 +10,7 @@
     "test": "npx cypress verify & cypress run --component"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.5.1",
     "@tanstack/react-query": "^5.65.1",
     "@tanstack/react-query-devtools": "^5.65.1",
     "@tanstack/react-table": "^8.20.6",
@@ -20,6 +21,8 @@
     "cross-env": "^7.0.3",
     "formik": "^2.4.6",
     "framer-motion": "^12.0.11",
+    "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
@@ -35,7 +38,9 @@
     "react-hook-form": "^7.54.2",
     "react-icons": "^5.4.0",
     "react-leaflet": "^4.2.1",
+    "react-redux": "^9.2.0",
     "react-timer-hook": "^3.0.8",
+    "react-toastify": "^11.0.3",
     "recharts": "^2.15.1",
     "sharp": "^0.33.5",
     "sonner": "^1.7.4",
@@ -51,6 +56,7 @@
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.65.0",
+    "@types/js-cookie": "^3.0.6",
     "@types/leaflet": "^1.9.16",
     "@types/node": "^20",
     "@types/react": "^18",

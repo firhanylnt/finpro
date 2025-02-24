@@ -1,12 +1,14 @@
 import { Request, Response, NextFunction } from "express";
+import { AuthenticatedRequest } from "@/custom";
 import { PrismaClient } from "@prisma/client";
-import { genSalt, hash, compare } from "bcrypt";
+import { genSalt, hash } from "bcrypt";
 const prisma = new PrismaClient();
 
 export class UsersController {
-    async create(req: Request, res: Response, next: NextFunction) {
+    async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const { fullname, email, password, role_id, store_id, status, created_by } = req.body;
+            
+            const { fullname, email, password, role_id, store_id, status } = req.body;
             const checkAdmin = await prisma.admins.findUnique({
                 where: { email },
             });
@@ -14,16 +16,10 @@ export class UsersController {
             if (checkAdmin) throw new Error("Email sudah terdaftar");
 
             const roles = await prisma.roles.findUnique({
-                where: { id: role_id },
+                where: { id: Number(role_id) },
             });
 
             if (!roles) throw new Error("Role tidak ada");
-
-            const store = await prisma.stores.findUnique({
-                where: { id: store_id },
-            });
-
-            if (!store) throw new Error("Store tidak ada");
 
             const salt = await genSalt(10);
             const hashPassword = await hash(password, salt);
@@ -35,9 +31,9 @@ export class UsersController {
                         email: email,
                         password: hashPassword,
                         role_id: roles.id,
-                        store_id: store.id,
-                        status: status,
-                        createdBy: created_by,
+                        store_id: store_id ? Number(store_id) : null,
+                        status: status === 'true' ? true : false,
+                        createdBy: req.admin?.id,
                     },
                 });
             });
@@ -50,14 +46,16 @@ export class UsersController {
         }
     }
 
-    async update(req: Request, res: Response, next: NextFunction) {
+    async update(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
-            const { fullname, email, password, role_id, status, store_id, updated_by } = req.body;
+            const { fullname, email, password, role_id, status, store_id } = req.body;
 
             const checkAdmin = await prisma.admins.findUnique({
                 where: { id: Number(id) },
             });
+
+            console.log(checkAdmin)
 
             if (!checkAdmin) throw new Error("Admin Tidak Temukan");
 
@@ -66,12 +64,6 @@ export class UsersController {
             });
 
             if (!roles) throw new Error("Role tidak ada");
-
-            const store = await prisma.stores.findUnique({
-                where: { id: store_id },
-            });
-
-            if (!store) throw new Error("Store tidak ada");
 
             let hashPassword = checkAdmin.password;
             if (password !== '') {
@@ -86,68 +78,85 @@ export class UsersController {
                     email: email,
                     password: hashPassword,
                     role_id: roles.id,
-                    store_id: store.id,
-                    status: status,
-                    updatedBy: updated_by,
+                    store_id: store_id ? Number(store_id) : null,
+                    status: status === 'true' ? true : false,
+                    updatedBy: req.admin?.id,
                     updatedAt: new Date(),
                 },
-            })
+            });
+
+            res.status(200).send({
+                message: 'Success update Admin',
+            });
 
         } catch (error) {
             next(error);
         }
     }
 
-    async getAll(req: Request, res: Response, next: NextFunction) {
+    async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             interface IFilter {
-                keyword?: string;
+                search?: string;
+                sortBy?: string;
+                sortOrder?: string;
                 page: number;
-                pageSize: number;
             }
-
-            const { keyword, page, pageSize } = req.query;
-
+        
+            const { search, sortBy, sortOrder, page } = req.query;
+        
             const filter: IFilter = {
-                keyword: keyword ? String(keyword) : '',    
+                search: search ? String(search) : "",
+                sortBy: sortBy ? String(sortBy) : "fullname",
+                sortOrder: sortOrder === "desc" ? "desc" : "asc",
                 page: parseInt(page as string) || 1,
-                pageSize: parseInt(pageSize as string) || 10,
             };
-
+        
             const whereCondition: any = {
                 AND: [{ deletedAt: null }],
             };
-
-            if (filter.keyword) {
+        
+            if (filter.search) {
                 whereCondition.OR = [
-                    { fullname: { contains: filter.keyword } },
-                    { email: { contains: filter.keyword } },
-                    { store: { name: { contains: filter.keyword } } },
-                    { roles: { name: { contains: filter.keyword } } },
+                    { fullname: { contains: filter.search, mode: "insensitive" } },
+                    { email: { contains: filter.search, mode: "insensitive" } },
+                    { store: { name: { contains: filter.search, mode: "insensitive" } } },
+                    { roles: { name: { contains: filter.search, mode: "insensitive" } } },
                 ];
             }
 
+            const orderBy: Record<string, "asc" | "desc"> = {};
+            if (filter.sortBy) {
+                orderBy[filter.sortBy] = filter.sortOrder === "desc" ? "desc" : "asc";
+            }
+        
             const data = await prisma.admins.findMany({
                 select: {
-                    fullname: true, email: true, status: true,
+                    id: true,
+                    fullname: true,
+                    email: true,
+                    status: true,
+                    createdAt: true,
                     roles: true,
                     store: true,
                 },
                 where: whereCondition,
-                skip: filter.page != 1 ? (filter.page - 1) * filter.pageSize : 0,
-                take: filter.pageSize,
-            })
-
+                orderBy,
+                skip: (filter.page - 1) * 10,
+                take: 10,
+            });
+        
             res.status(200).send({
-                message: 'Get All Admin Data',
-                data
-            })
+                message: "Get All Admin Data",
+                data,
+            });
         } catch (error) {
             next(error);
         }
+        
     }
 
-    async getById(req: Request, res: Response, next: NextFunction) {
+    async getById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         const { id } = req.params;
 
         const admin = await prisma.admins.findUnique({
@@ -162,7 +171,7 @@ export class UsersController {
         })
     }
 
-    async delete(req: Request, res: Response, next: NextFunction) {
+    async delete(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         const { id } = req.params;
 
         const admin = await prisma.admins.findUnique({
@@ -171,11 +180,10 @@ export class UsersController {
 
         if (!admin) throw new Error("admin Tidak Terdaftar");
 
-        await prisma.admins.delete({
-            where: {
-                id: Number(id)
-            }
-        })
+        await prisma.admins.update({
+            where: { id: Number(id) },
+            data: { deletedAt: new Date() }
+        });
 
         res.status(200).send({
             message: 'Admin berhasil dihapus',

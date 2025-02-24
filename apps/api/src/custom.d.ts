@@ -1,14 +1,11 @@
-export type Admin = {
+import { Request } from "express";
+
+export interface AuthenticatedRequest extends Request {
+  admin?: {
+    id: number;
     email: string;
     name: string;
     role: number;
     store: number;
   };
-  
-  declare global {
-    namespace Express {
-      export interface Request {
-        admin?: Admin;
-      }
-    }
-  }
+}

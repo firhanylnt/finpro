@@ -13,11 +13,13 @@ import { AuthRouter } from './routers/auth.route';
 import { UsersRouter } from './routers/users.route';
 import { ProductRouter } from './routers/product.route';
 import { ProductCategoryRouter } from './routers/productCategory.route';
+import { MasterDataRouter } from './routers/masterdata.route';
+import { DiscountRouter } from './routers/discount.route';
+import { StockRouter } from './routers/stock.route';
 
 import helmet from "helmet";
 import ErrorMiddleware from "./middlewares/errorMiddleware";
-import { DiscountRouter } from './routers/discount.route';
-import { StockRouter } from './routers/stock.route';
+
 
 export default class App {
   private app: Express;
@@ -47,6 +49,7 @@ export default class App {
     const productCategoryRouter = new ProductCategoryRouter();
     const discountRouter = new DiscountRouter();
     const stockRouter = new StockRouter();
+    const masterDataRouter = new MasterDataRouter();
     
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -58,6 +61,7 @@ export default class App {
     this.app.use('/api/product-category', productCategoryRouter.getRouter());
     this.app.use('/api/discount', discountRouter.getRouter());
     this.app.use('/api/stock', stockRouter.getRouter());
+    this.app.use('/api/master-data', masterDataRouter.getRouter());
   }
 
   public start(): void {
