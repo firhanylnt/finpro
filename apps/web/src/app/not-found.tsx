@@ -1,9 +1,9 @@
-import Link from 'next/link';
-import { Metadata } from 'next';
+import Link from "next/link";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: '404 Not Found',
-  description: 'Page did not exist',
+  title: "404 Not Found",
+  description: "Page did not exist",
 };
 
 export default function NotFound() {
@@ -20,7 +20,7 @@ export default function NotFound() {
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Link
-              className="flex h-10 items-center justify-center gap-2 rounded-full border border-solid bg-black px-4 text-sm text-white transition-colors hover:bg-[#383838] hover:text-white sm:h-12 sm:px-5 sm:text-base dark:bg-transparent dark:text-white dark:hover:bg-[#ccc] dark:hover:text-black"
+              className="flex h-10 items-center justify-center gap-2 rounded-full border border-solid bg-black px-4 text-sm text-white transition-colors hover:bg-[#383838] hover:text-white sm:h-12 sm:px-5 sm:text-base"
               href="/"
             >
               Go back home
