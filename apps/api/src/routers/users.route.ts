@@ -16,6 +16,7 @@ export class UsersRouter {
 
   private initializeRoutes(): void {
     this.router.get('/', VerifyToken, AdminGuard ,this.usersController.getAll);
+    this.router.get('/end-users', VerifyToken, AdminGuard ,this.usersController.getAllEndUsers);
     this.router.get('/:id', VerifyToken, AdminGuard,this.usersController.getById);
     this.router.post('/create', VerifyToken, AdminGuard, RegisterValidation, this.usersController.create);
     this.router.patch('/update/:id', VerifyToken, AdminGuard, this.usersController.update);

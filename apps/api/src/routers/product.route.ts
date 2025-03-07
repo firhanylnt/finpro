@@ -15,11 +15,10 @@ export class ProductRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.get('/', VerifyToken, AdminGuard ,this.product.getAll);
-    this.router.get('/list', this.product.getList);
-    this.router.get('/:id', VerifyToken, AdminGuard,this.product.getById);
+    this.router.get('/', VerifyToken ,this.product.getAll);
+    this.router.get('/:id', VerifyToken ,this.product.getById);
     this.router.post('/create', VerifyToken, AdminGuard, upload.array("images", 5), this.product.create);
-    this.router.patch('/update/:id', VerifyToken, AdminGuard, this.product.update);
+    this.router.patch('/update/:id', VerifyToken, AdminGuard, upload.array("images", 5), this.product.update);
     this.router.delete('/delete/:id', VerifyToken, AdminGuard, this.product.delete);
   }
 

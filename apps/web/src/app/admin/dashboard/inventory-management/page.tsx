@@ -4,42 +4,57 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import api from "@/lib/axios";
 import Link from "next/link";
+import DeleteConfirmation from "@/components/admin/deleteConfirmation";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Pagination from "@/components/admin/pagination";
+import SearchInput from "@/components/admin/search";
+import { useSelector } from "react-redux";
+import Stock from "@/features/types/stock";
+import Select from "react-select";
+import Store from "@/features/types/store";
 
-interface Admin {
-  id: number;
-  fullname: string;
-  email: string;
-  roles: {
-    name: string;
-  };
-  store: string;
-  createdAt: Date;  
-}
-
-const AdminListPage = () => {
+const CategoriesListPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const user = useSelector((state: any) => state.auth.user); 
 
+  const [storeId, setStoreId] = useState<number | null>(searchParams.get("storeId") || user?.store || localStorage.getItem("storeId") || null);
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "name");
   const [sortOrder, setSortOrder] = useState(searchParams.get("sortOrder") || "asc");
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
-
-  const [admins, setAdmins] = useState<Admin[]>([]);
+  const [stores, setStores] = useState<Store[]>([]);
+  const [stock, setStock] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(false);
+  const [disabled, setDisabled] = useState<boolean>(true);
 
   useEffect(() => {
-    fetchAdmins();
+    fetchData();
+    fetchStores();
+    if(user.store === null) {
+      setDisabled(false);
+    }
   }, [searchParams.toString()]);
 
-  const fetchAdmins = async () => {
+  const fetchData = async () => {
+    if (!storeId) return;
     setLoading(true);
-    const query = new URLSearchParams({ search, sortBy, sortOrder, page: page.toString() }).toString();
-    const res = await api(`/users?${query}`);
+    const query = new URLSearchParams({ storeId: storeId.toString(), search, sortBy, sortOrder, page: page.toString() }).toString();
+    const res = await api(`/stock?${query}`);
     const { data } = res.data;
-    setAdmins(data);
+    setStock(data);
     setLoading(false);
   };
+
+  const fetchStores = async () => {
+    try {
+        const res = await api.get("/master-data/stores");
+        setStores(res.data.data);
+    } catch (error) {
+        console.error("Error fetching stores", error);
+    }
+};
 
   const updateQueryParams = (params: Record<string, string | number>) => {
     const newParams = new URLSearchParams(searchParams.toString());
@@ -68,21 +83,33 @@ const AdminListPage = () => {
     updateQueryParams({ page: newPage });
   };
 
+  const handleStoreSelect = (selectedStoreId: number) => {
+    localStorage.setItem("storeId", String(selectedStoreId));
+    setStoreId(selectedStoreId);
+    updateQueryParams({ storeId: selectedStoreId });
+  };
+
   return (
     <div className="w-full mx-[30px] mt-[30px]">
-      <h1 className="text-2xl mb-6 text-gray-800">Admin List</h1>
-      <div className="my-4">
-        <Link href={'admin/create'} className="bg-green-500 py-2 px-4 mr-4 rounded-md text-white">+ Create</Link>
-      </div>
-      <div className="flex mb-6">
-        <input
-          type="text"
-          placeholder="Search by name..."
-          value={search}
-          onChange={handleSearch}
-          className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+      <h1 className="text-2xl mb-6 text-gray-800">Product Stock</h1>
+      {user.store === null && (
+        <Select
+          options={stores}
+          name="store_id"
+          isDisabled={disabled}
+          isClearable={true}
+          getOptionLabel={(e) => e.name}
+          getOptionValue={(e) => String(e.id)}
+          onChange={(selectedOption) => handleStoreSelect(Number(selectedOption?.id))}
+          value={stores.find((option) => option.id === Number(storeId)) || null}
         />
-      </div>
+      )}
+      
+      <div className="my-4">
+          <Link href={'inventory-management/create'} className="bg-green-500 py-2 px-4 mr-4 rounded-md text-white">+ Create</Link>
+        </div>
+      
+      <SearchInput value={search} onChange={handleSearch} placeholder="Search by name..." />
 
       <div className="overflow-x-auto bg-white shadow-md rounded-lg">
         <table className="w-full border-collapse border-gray-900">
@@ -91,14 +118,10 @@ const AdminListPage = () => {
               <th className="border p-3 cursor-pointer" onClick={() => handleSort("name")}>
                 Name {sortBy === "name" && (sortOrder === "asc" ? "▲" : "▼")}
               </th>
-              <th className="border p-3 cursor-pointer" onClick={() => handleSort("email")}>
-                Email {sortBy === "email" && (sortOrder === "asc" ? "▲" : "▼")}
-              </th>
-              <th className="border p-3">Role</th>
-              <th className="border p-3 cursor-pointer" onClick={() => handleSort("createdAt")}>
-                Created At {sortBy === "createdAt" && (sortOrder === "asc" ? "▲" : "▼")}
-              </th>
-              <th className="border p-3">Action</th>
+              <th className="border p-3">Qty</th>
+              {user?.role === 1 && (
+                <th className="border p-3">Action</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -106,46 +129,37 @@ const AdminListPage = () => {
               <tr>
                 <td colSpan={3} className="p-4 text-center text-gray-500">Loading...</td>
               </tr>
-            ) : admins.length > 0 ? (
-              admins.map((admin: Admin) => (
-                <tr key={admin.id} className="border-b hover:bg-gray-50 text-center">
-                  <td className="p-3">{admin.fullname}</td>
-                  <td className="p-3">{admin.email}</td>
-                  <td className="p-3">{admin.roles.name}</td>
-                  <td className="p-3">{new Date(admin.createdAt).toLocaleDateString()}</td>
-                  <td className="p-3">
-                    <Link href={`admin/${admin.id}`} className="bg-blue-500 py-1 px-4 mr-4 rounded-md text-white">Edit</Link>
-                    <button className="bg-red-500 py-1 px-4 rounded-md text-white">Delete</button>
-                  </td>
+            ) : stock.length > 0 ? (
+              stock.map((stock: Stock) => (
+                <tr key={stock.id} className="border-b hover:bg-gray-50 text-center">
+                  <td className="p-3 border-1 border-black">{stock.products.name}</td>
+                  <td className="p-3">{stock.qty}</td>
+                  {user?.role === 1 && (
+                    <td className="p-3">
+                      <ToastContainer position="top-center" />
+                      <button className="bg-blue-500 py-1 px-4 mr-2 rounded-md text-white" onClick={() => router.push(`inventory-management/${stock.id}`)}>Edit</button>
+                      <DeleteConfirmation
+                        apiUrl="/stock/delete"
+                        itemId={stock.id}
+                        onDeleteSuccess={fetchData}
+                      />
+                    </td>
+                  )}
+                  
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="p-4 text-center text-gray-500">No data found</td>
+                <td colSpan={6} className="p-4 text-center text-gray-500">No data found</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+      <Pagination page={page} onPageChange={handlePageChange} />
 
-      <div className="flex justify-between mt-6">
-        <button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page <= 1}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
-        >
-          Previous
-        </button>
-        <span className="text-gray-700">Page {page}</span>
-        <button
-          onClick={() => handlePageChange(page + 1)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          Next
-        </button>
-      </div>
     </div>
   );
 };
 
-export default AdminListPage;
+export default CategoriesListPage;

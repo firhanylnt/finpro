@@ -9,6 +9,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Pagination from "@/components/admin/pagination";
 import SearchInput from "@/components/admin/search";
+import { useSelector } from "react-redux";
 
 interface Category {
   id: number;
@@ -19,6 +20,7 @@ interface Category {
 const CategoriesListPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const user = useSelector((state: any) => state.auth.user); 
 
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "name");
@@ -86,7 +88,9 @@ const CategoriesListPage = () => {
               <th className="border p-3 cursor-pointer" onClick={() => handleSort("description")}>
                 Description {sortBy === "description" && (sortOrder === "asc" ? "▲" : "▼")}
               </th>
-              <th className="border p-3">Action</th>
+              {user?.role === 1 && (
+                <th className="border p-3">Action</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -97,17 +101,20 @@ const CategoriesListPage = () => {
             ) : category.length > 0 ? (
               category.map((category: Category) => (
                 <tr key={category.id} className="border-b hover:bg-gray-50 text-center">
-                  <td className="p-3">{category.name}</td>
+                  <td className="p-3 border-1 border-black">{category.name}</td>
                   <td className="p-3">{category.description}</td>
-                  <td className="p-3">
-                    <ToastContainer position="top-center" />
-                    <button className="bg-blue-500 py-1 px-4 mr-2 rounded-md text-white" onClick={() => router.push(`categories/${category.id}`)}>Edit</button>
-                    <DeleteConfirmation
-                      apiUrl="/product-category/delete"
-                      itemId={category.id}
-                      onDeleteSuccess={fetchData}
-                    />
-                  </td>
+                  {user?.role === 1 && (
+                    <td className="p-3">
+                      <ToastContainer position="top-center" />
+                      <button className="bg-blue-500 py-1 px-4 mr-2 rounded-md text-white" onClick={() => router.push(`categories/${category.id}`)}>Edit</button>
+                      <DeleteConfirmation
+                        apiUrl="/product-category/delete"
+                        itemId={category.id}
+                        onDeleteSuccess={fetchData}
+                      />
+                    </td>
+                  )}
+                  
                 </tr>
               ))
             ) : (

@@ -7,27 +7,15 @@ import * as Yup from "yup";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from 'next/navigation';
-
-interface Categories {
-    id: number;
-    name: string;
-}
+import { Categories } from "@/features/types/product";
+import { initialValues, validationSchema } from "@/features/schema/productSchema";
 
 export default function ProductForm() {
     const [selectedImages, setSelectedImages] = useState<File[]>([]);
     const [category, setCategory] = useState<Categories[]>([]);
     const router = useRouter();
 
-    const validationSchema = Yup.object({
-        name: Yup.string().required("Nama produk wajib diisi"),
-        product_category_id: Yup.number().required("Kategori produk wajib diisi"),
-        description: Yup.string().required("Deskripsi wajib diisi"),
-        price: Yup.number().positive("Harga harus lebih dari 0").required("Harga wajib diisi"),
-        status: Yup.string().oneOf(["active", "inactive"], "Status tidak valid").required("Status wajib dipilih"),
-    });
-
     const handleSubmit = async (values: any, { resetForm }: any) => {
-        console.log(values);
         try {
             const formData = new FormData();
             formData.append("name", values.name);
@@ -46,30 +34,12 @@ export default function ProductForm() {
 
             resetForm();
             setSelectedImages([]);
-            toast.success('Successfully create product!', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                progress: undefined,
-                theme: "colored",
-                transition: Bounce,
-            });
+            toast.success('Successfully create product!');
             setTimeout(() => {
                 router.back();
             }, 3000)
         } catch (error: any) {
-            toast.error(error?.response?.data.message, {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                progress: undefined,
-                theme: "colored",
-                transition: Bounce,
-            });
+            toast.error(error?.response?.data.message);
         }
     };
 
@@ -110,17 +80,11 @@ export default function ProductForm() {
 
     return (
         <div className="w-full mx-auto p-6 bg-white shadow-md rounded-lg">
-            <ToastContainer />
+            <ToastContainer transition={Bounce} closeOnClick={true} autoClose={3000} hideProgressBar={false} theme="colored" position="top-right" />
             <h2 className="text-2xl font-semibold mb-4">Tambah Produk</h2>
 
             <Formik
-                initialValues={{
-                    name: "",
-                    product_category_id: "",
-                    description: "",
-                    price: "",
-                    status: "",
-                }}
+                initialValues={initialValues}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
             >
@@ -156,8 +120,8 @@ export default function ProductForm() {
                         <div className="mb-3">
                             <Field as="select" name="status" className="w-full p-2 border rounded">
                                 <option value="">Pilih Status</option>
-                                <option value="active">Aktif</option>
-                                <option value="inactive">Tidak Aktif</option>
+                                <option value="true">Aktif</option>
+                                <option value="false">Tidak Aktif</option>
                             </Field>
                             <ErrorMessage name="status" component="div" className="text-red-500 text-sm mt-1" />
                         </div>

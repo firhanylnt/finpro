@@ -4,40 +4,42 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import api from "@/lib/axios";
 import Link from "next/link";
+import DeleteConfirmation from "@/components/admin/deleteConfirmation";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Pagination from "@/components/admin/pagination";
+import SearchInput from "@/components/admin/search";
+import { useSelector } from "react-redux";
 
-interface Admin {
+interface Category {
   id: number;
-  fullname: string;
-  email: string;
-  roles: {
-    name: string;
-  };
-  store: string;
-  createdAt: Date;  
+  name: string;
+  description: string;
 }
 
-const AdminListPage = () => {
+const StorePages = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const user = useSelector((state: any) => state.auth.user); 
 
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "name");
   const [sortOrder, setSortOrder] = useState(searchParams.get("sortOrder") || "asc");
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
 
-  const [admins, setAdmins] = useState<Admin[]>([]);
+  const [category, setCategory] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchAdmins();
+    fetchData();
   }, [searchParams.toString()]);
 
-  const fetchAdmins = async () => {
+  const fetchData = async () => {
     setLoading(true);
     const query = new URLSearchParams({ search, sortBy, sortOrder, page: page.toString() }).toString();
-    const res = await api(`/users?${query}`);
+    const res = await api(`/store?${query}`);
     const { data } = res.data;
-    setAdmins(data);
+    setCategory(data);
     setLoading(false);
   };
 
@@ -70,19 +72,11 @@ const AdminListPage = () => {
 
   return (
     <div className="w-full mx-[30px] mt-[30px]">
-      <h1 className="text-2xl mb-6 text-gray-800">Admin List</h1>
+      <h1 className="text-2xl mb-6 text-gray-800">Stores</h1>
       <div className="my-4">
-        <Link href={'admin/create'} className="bg-green-500 py-2 px-4 mr-4 rounded-md text-white">+ Create</Link>
+        <Link href={'store-management/create'} className="bg-green-500 py-2 px-4 mr-4 rounded-md text-white">+ Create</Link>
       </div>
-      <div className="flex mb-6">
-        <input
-          type="text"
-          placeholder="Search by name..."
-          value={search}
-          onChange={handleSearch}
-          className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-      </div>
+      <SearchInput value={search} onChange={handleSearch} placeholder="Search by name..." />
 
       <div className="overflow-x-auto bg-white shadow-md rounded-lg">
         <table className="w-full border-collapse border-gray-900">
@@ -91,14 +85,12 @@ const AdminListPage = () => {
               <th className="border p-3 cursor-pointer" onClick={() => handleSort("name")}>
                 Name {sortBy === "name" && (sortOrder === "asc" ? "▲" : "▼")}
               </th>
-              <th className="border p-3 cursor-pointer" onClick={() => handleSort("email")}>
-                Email {sortBy === "email" && (sortOrder === "asc" ? "▲" : "▼")}
+              <th className="border p-3 cursor-pointer" onClick={() => handleSort("description")}>
+                Description {sortBy === "description" && (sortOrder === "asc" ? "▲" : "▼")}
               </th>
-              <th className="border p-3">Role</th>
-              <th className="border p-3 cursor-pointer" onClick={() => handleSort("createdAt")}>
-                Created At {sortBy === "createdAt" && (sortOrder === "asc" ? "▲" : "▼")}
-              </th>
-              <th className="border p-3">Action</th>
+              {user?.role === 1 && (
+                <th className="border p-3">Action</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -106,46 +98,36 @@ const AdminListPage = () => {
               <tr>
                 <td colSpan={3} className="p-4 text-center text-gray-500">Loading...</td>
               </tr>
-            ) : admins.length > 0 ? (
-              admins.map((admin: Admin) => (
-                <tr key={admin.id} className="border-b hover:bg-gray-50 text-center">
-                  <td className="p-3">{admin.fullname}</td>
-                  <td className="p-3">{admin.email}</td>
-                  <td className="p-3">{admin.roles.name}</td>
-                  <td className="p-3">{new Date(admin.createdAt).toLocaleDateString()}</td>
-                  <td className="p-3">
-                    <Link href={`admin/${admin.id}`} className="bg-blue-500 py-1 px-4 mr-4 rounded-md text-white">Edit</Link>
-                    <button className="bg-red-500 py-1 px-4 rounded-md text-white">Delete</button>
-                  </td>
+            ) : category.length > 0 ? (
+              category.map((category: Category) => (
+                <tr key={category.id} className="border-b hover:bg-gray-50 text-center">
+                  <td className="p-3 border-1 border-black">{category.name}</td>
+                  <td className="p-3">{category.description}</td>
+                  {user?.role === 1 && (
+                    <td className="p-3">
+                      <ToastContainer position="top-center" />
+                      <button className="bg-blue-500 py-1 px-4 mr-2 rounded-md text-white" onClick={() => router.push(`store-management/${category.id}`)}>Edit</button>
+                      <DeleteConfirmation
+                        apiUrl="/product-category/delete"
+                        itemId={category.id}
+                        onDeleteSuccess={fetchData}
+                      />
+                    </td>
+                  )}
+                  
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="p-4 text-center text-gray-500">No data found</td>
+                <td colSpan={6} className="p-4 text-center text-gray-500">No data found</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
-
-      <div className="flex justify-between mt-6">
-        <button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page <= 1}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
-        >
-          Previous
-        </button>
-        <span className="text-gray-700">Page {page}</span>
-        <button
-          onClick={() => handlePageChange(page + 1)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          Next
-        </button>
-      </div>
+      <Pagination page={page} onPageChange={handlePageChange} />
     </div>
   );
 };
 
-export default AdminListPage;
+export default StorePages;

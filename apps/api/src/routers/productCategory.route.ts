@@ -14,8 +14,7 @@ export class ProductCategoryRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.get('/', VerifyToken, AdminGuard ,this.productCategoryController.getAll);
-    this.router.get('/list', this.productCategoryController.getList);
+    this.router.get('/', VerifyToken ,this.productCategoryController.getAll);
     this.router.get('/:id', VerifyToken, AdminGuard,this.productCategoryController.getById);
     this.router.post('/create', VerifyToken, AdminGuard, this.productCategoryController.create);
     this.router.patch('/update/:id', VerifyToken, AdminGuard, this.productCategoryController.update);

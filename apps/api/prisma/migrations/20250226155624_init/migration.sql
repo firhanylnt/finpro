@@ -22,7 +22,7 @@ CREATE TABLE "UserAddress" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
-    "phone_number" INTEGER NOT NULL,
+    "phone_number" TEXT NOT NULL,
     "is_main_address" BOOLEAN NOT NULL,
     "lat" TEXT NOT NULL,
     "long" TEXT NOT NULL,
@@ -81,8 +81,8 @@ CREATE TABLE "Stores" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
-    "createdBy" INTEGER NOT NULL,
-    "updatedBy" INTEGER NOT NULL,
+    "createdBy" INTEGER,
+    "updatedBy" INTEGER,
     "deletedBy" INTEGER,
 
     CONSTRAINT "Stores_pkey" PRIMARY KEY ("id")
@@ -99,8 +99,8 @@ CREATE TABLE "Products" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
-    "createdBy" INTEGER NOT NULL,
-    "updatedBy" INTEGER NOT NULL,
+    "createdBy" INTEGER,
+    "updatedBy" INTEGER,
     "deletedBy" INTEGER,
 
     CONSTRAINT "Products_pkey" PRIMARY KEY ("id")
@@ -114,7 +114,7 @@ CREATE TABLE "ProductCategory" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
-    "createdBy" INTEGER NOT NULL,
+    "createdBy" INTEGER,
     "updatedBy" INTEGER,
     "deletedBy" INTEGER,
 
@@ -151,8 +151,8 @@ CREATE TABLE "Stock" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
-    "createdBy" INTEGER NOT NULL,
-    "updatedBy" INTEGER NOT NULL,
+    "createdBy" INTEGER,
+    "updatedBy" INTEGER,
     "deletedBy" INTEGER,
 
     CONSTRAINT "Stock_pkey" PRIMARY KEY ("id")
@@ -168,8 +168,8 @@ CREATE TABLE "JurnalStock" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
-    "createdBy" INTEGER NOT NULL,
-    "updatedBy" INTEGER NOT NULL,
+    "createdBy" INTEGER,
+    "updatedBy" INTEGER,
     "deletedBy" INTEGER,
 
     CONSTRAINT "JurnalStock_pkey" PRIMARY KEY ("id")
@@ -180,14 +180,17 @@ CREATE TABLE "Discount" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "discount_type_id" INTEGER NOT NULL,
+    "amount" DOUBLE PRECISION,
+    "min_purchase" DOUBLE PRECISION,
+    "max_discount" DOUBLE PRECISION,
     "status" BOOLEAN NOT NULL,
     "start_date" TIMESTAMP(3) NOT NULL,
     "end_date" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
-    "createdBy" INTEGER NOT NULL,
-    "updatedBy" INTEGER NOT NULL,
+    "createdBy" INTEGER,
+    "updatedBy" INTEGER,
     "deletedBy" INTEGER,
 
     CONSTRAINT "Discount_pkey" PRIMARY KEY ("id")
@@ -231,8 +234,8 @@ CREATE TABLE "Transactions" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
-    "createdBy" INTEGER NOT NULL,
-    "updatedBy" INTEGER NOT NULL,
+    "createdBy" INTEGER,
+    "updatedBy" INTEGER,
     "deletedBy" INTEGER,
 
     CONSTRAINT "Transactions_pkey" PRIMARY KEY ("id")
@@ -256,8 +259,8 @@ CREATE TABLE "PaymentMethod" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
-    "createdBy" INTEGER NOT NULL,
-    "updatedBy" INTEGER NOT NULL,
+    "createdBy" INTEGER,
+    "updatedBy" INTEGER,
     "deletedBy" INTEGER,
 
     CONSTRAINT "PaymentMethod_pkey" PRIMARY KEY ("id")

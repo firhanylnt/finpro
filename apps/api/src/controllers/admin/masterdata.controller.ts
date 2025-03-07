@@ -71,6 +71,22 @@ export class MasterDataController {
         }
     }
 
+    async get_discount_type(req: Request, res: Response, next: NextFunction) {
+        try {
+            const data = await prisma.discountType.findMany({
+                orderBy: {name: 'asc'}
+            });
+
+            res.status(200).send({
+                message: 'Get All Discount Type',
+                data
+            })
+
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async get_product_by_store(req: Request, res: Response, next: NextFunction) {
         
         try {

@@ -1,69 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { PrismaClient } from "@prisma/client";
 import { AuthenticatedRequest } from "@/custom";
-const prisma = new PrismaClient();
+import { createStock, getAllData, updateStock } from "@/services/stock.service";
 
 export class StockController {
 
     async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const { product_id, store_id, type, qty } = req.body;
-            const checkExist = await prisma.stock.findFirst({
-                where: { product_id: Number(product_id), store_id: Number(store_id) },
-            });
-
-            if (type === 'OUT') {
-                if (!checkExist || checkExist.qty === undefined || checkExist.qty <= 0) {
-                    throw new Error("Stock Tidak Ada");
-                }
-            }
-
-            await prisma.$transaction(async (prisma) => {
-                if(checkExist) {
-                    await prisma.jurnalStock.create({
-                        data: {
-                            stock_id: checkExist.id,
-                            type: type,
-                            qty: qty,
-                            status: true,
-                            createdBy: req.admin?.id,
-                            updatedBy: req.admin?.id,
-                        }
-                    });
-
-                    const totalQty = type === 'OUT' ? Number(checkExist.qty) - Number(qty) : Number(checkExist.qty) + Number(qty);
-                    await prisma.stock.update({
-                        where: {id: Number(checkExist.id)},
-                        data: {
-                            qty: totalQty,
-                        }
-                    });
-
-                }else{
-                    const newData = await prisma.stock.create({
-                        data: {
-                            product_id: product_id,
-                            store_id: store_id,
-                            qty: qty,
-                            createdBy: req.admin?.id,
-                            updatedBy: req.admin?.id,
-                        },
-                    });
-
-                    await prisma.jurnalStock.create({
-                        data: {
-                            stock_id: newData.id,
-                            type: type,
-                            qty: qty,
-                            status: true,
-                            createdBy: req.admin?.id,
-                            updatedBy: req.admin?.id,
-                        }
-                    });
-
-                }
-
-            });
+            await createStock(req);
 
             res.status(200).send({
                 message: 'Success Create Stock',
@@ -75,42 +18,46 @@ export class StockController {
 
     async update(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const { id } = req.params;
-            const { product_id, store_id, type, qty } = req.body;
-            const checkExist = await prisma.stock.findFirst({
-                where: { id: Number(id) },
-            });
-
-            if(!checkExist) throw new Error("Stock Tidak Ditemukan");
-
-            if (type === 'OUT') {
-                if (!checkExist || checkExist.qty === undefined || checkExist.qty <= 0) {
-                    throw new Error("Stock Tidak Ada");
-                }
-            }
-
-            await prisma.jurnalStock.create({
-                data: {
-                    stock_id: checkExist?.id,
-                    type: type,
-                    qty: qty,
-                    status: true,
-                    createdBy: req.admin?.id,
-                    updatedBy: req.admin?.id,
-                }
-            });
-
-            const totalQty = type === 'OUT' ? Number(checkExist.qty) - Number(qty) : Number(checkExist.qty) + Number(qty);
-            await prisma.stock.update({
-                where: {id: Number(checkExist.id)},
-                data: {
-                    qty: totalQty,
-                }
+            await updateStock(req);
+            
+            res.status(200).send({
+                message: 'Success update stock',
             });
 
         } catch (error) {
             next(error);
         }
     }
+
+    async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+            try {
+                interface IFilter {
+                    storeId: number,
+                    search?: string;
+                    sortBy?: string;
+                    sortOrder?: string;
+                    page: number;
+                }
+            
+                const { storeId, search, sortBy, sortOrder, page } = req.query;
+            
+                const filter: IFilter = {
+                    storeId: parseInt(storeId as string) || 0,
+                    search: search ? String(search) : "",
+                    sortBy: sortBy ? String(sortBy) : "name",
+                    sortOrder: sortOrder === "desc" ? "desc" : "asc",
+                    page: parseInt(page as string) || 1,
+                };
+    
+                const data = await getAllData(filter);
+    
+                res.status(200).send({
+                    message: 'Get All Category',
+                    data
+                })
+            } catch (error) {
+                next(error);
+            }
+        }
 
 }

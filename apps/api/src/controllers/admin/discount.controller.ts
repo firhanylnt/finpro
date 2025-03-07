@@ -1,28 +1,12 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "@/custom";
-import { PrismaClient } from "@prisma/client";
-import { genSalt, hash, compare } from "bcrypt";
-const prisma = new PrismaClient();
+import { createDiscount, deleteDiscount, getAllData, getById, updateDiscount } from "@/services/discount.service";
 
 export class DiscountController {
 
     async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const { name, discount_type_id, start_date, end_date, status } = req.body;
-
-            await prisma.$transaction(async (prisma) => {
-                await prisma.discount.create({
-                    data: {
-                        name: name,
-                        discount_type_id: discount_type_id,
-                        start_date: start_date,
-                        end_date: end_date,
-                        status: status,
-                        createdBy: req.admin?.id,
-                    },
-                });
-            });
-
+            const insert = await createDiscount(req);
             res.status(200).send({
                 message: 'Success Create Discount',
             });
@@ -33,46 +17,13 @@ export class DiscountController {
 
     async update(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const { id } = req.params;
-            const { name, discount_type_id, start_date, end_date, status, updated_by } = req.body;
+            
+            const update = await updateDiscount(req);
 
-            const checkExist = await prisma.discount.findUnique({
-                where: { id : Number(id) },
-            });
-
-            if (!checkExist) throw new Error("Discount Tidak Terdaftar");
-
-            const update = await prisma.discount.update({
-                where: { id: Number(id) },
-                data: {
-                    name: name,
-                    discount_type_id: discount_type_id,
-                    start_date: start_date,
-                    end_date: end_date,
-                    status: status,
-                    updatedBy: req.admin?.id,
-                    updatedAt: new Date(),
-                },
-            })
-
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    async getList(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-        try {
-            const category = await prisma.discount.findMany({
-                select: {
-                    id: true, name: true
-                },
-                orderBy: {name: 'asc'}
-            });
-    
             res.status(200).send({
-                message: 'List Discount',
-                data: category,
+                message: 'Success update discount',
             });
+
         } catch (error) {
             next(error);
         }
@@ -81,35 +32,26 @@ export class DiscountController {
     async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             interface IFilter {
-                keyword?: string;
+                search?: string;
+                sortBy?: string;
+                store_id?: number;
+                discount_type_id?: number;
+                sortOrder?: string;
                 page: number;
-                pageSize: number;
             }
-
-            const { keyword, page, pageSize } = req.query;
-
+        
+            const { search, store_id, discount_type_id, sortBy, sortOrder, page } = req.query;
+        
             const filter: IFilter = {
-                keyword: keyword ? String(keyword) : '',
+                search: search ? String(search) : "",
+                sortBy: sortBy ? String(sortBy) : "name",
+                sortOrder: sortOrder === "desc" ? "desc" : "asc",
                 page: parseInt(page as string) || 1,
-                pageSize: parseInt(pageSize as string) || 10,
+                store_id: parseInt(store_id as string) || undefined,
+                discount_type_id: parseInt(discount_type_id as string) || undefined,
             };
-
-            const data = await prisma.discount.findMany({
-                select: {
-                    name: true,
-                    discount_type_id: true,
-                },
-                where: {
-                    OR: [
-                        { name: { contains: filter.keyword } },
-                    ],
-                    AND: [
-                        { deletedAt: null }
-                    ],
-                },
-                skip: filter.page != 1 ? (filter.page - 1) * filter.pageSize : 0,
-                take: filter.pageSize,
-            })
+        
+            const data = await getAllData(filter);
 
             res.status(200).send({
                 message: 'Get All Discount',
@@ -123,11 +65,7 @@ export class DiscountController {
     async getById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         const { id } = req.params;
 
-        const category = await prisma.discount.findUnique({
-            where: { id: Number(id) },
-        });
-
-        if (!category) throw new Error("Discount Tidak Ditemukan");
+        const category = await getById(Number(id));
 
         res.status(200).send({
             message: 'Get Discount By Id',
@@ -138,17 +76,7 @@ export class DiscountController {
     async delete(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         const { id } = req.params;
 
-        const category = await prisma.discount.findUnique({
-            where: { id: Number(id) },
-        });
-
-        if (!category) throw new Error("Discount Tidak Terdaftar");
-
-        await prisma.discount.delete({
-            where: {
-                id: Number(id)
-            }
-        })
+        const del = await deleteDiscount(Number(id));
 
         res.status(200).send({
             message: 'Discount berhasil dihapus',

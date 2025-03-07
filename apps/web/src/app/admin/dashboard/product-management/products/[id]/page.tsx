@@ -1,234 +1,197 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
+import { useEffect, useState } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import api from "@/lib/axios";
+import * as Yup from "yup";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams } from "next/navigation";
+import { validationSchema } from "@/features/schema/productSchema";
+import { Categories } from "@/features/types/product";
 
-interface Role {
-    id: number;
-    name: string;
-}
 
-interface Store {
-    id: number;
-    name: string;
-}
-
-const AdminForm = () => {
-    const [roles, setRoles] = useState<Role[]>([]);
-    const [stores, setStores] = useState<Store[]>([]);
-    const [loading, setLoading] = useState(false);
+export default function ProductForm() {
+    const [selectedImages, setSelectedImages] = useState<File[]>([]);
+    const [selectedImageUrls, setSelectedImageUrls] = useState<string[]>([]);
+    const [category, setCategory] = useState<Categories[]>([]);
+    const [initialValues, setInitialValues] = useState({
+        name: "",
+        product_category_id: "",
+        description: "",
+        price: "",
+        status: "",
+    });
     const router = useRouter();
     const params = useParams();
 
     useEffect(() => {
-        fetchRoles();
-        fetchStores();
-        fetchData();
-    }, []);
-
-    const fetchData = async () => {
-        try {
-            const { data } = await api.get(`/users/${params.id}`);
-            formik.setFieldValue("fullname", data.data.fullname);
-            formik.setFieldValue("email", data.data.email);
-            formik.setFieldValue("role_id", data.data.role_id);
-            formik.setFieldValue("store_id", data.data.store_id ?? 0);
-        } catch (error) {
-            console.error("Error fetching roles", error);
-        }
-    };
-
-    const fetchRoles = async () => {
-        try {
-            const { data } = await api.get("/master-data/roles");
-            setRoles(data.data);
-        } catch (error) {
-            console.error("Error fetching roles", error);
-        }
-    };
-
-    const fetchStores = async () => {
-        try {
-            const { data } = await api.get("/master-data/stores");
-            setStores(data.data);
-        } catch (error) {
-            console.error("Error fetching stores", error);
-        }
-    };
-
-    const formik = useFormik({
-        initialValues: {
-            fullname: "",
-            email: "",
-            password: "",
-            role_id: 0,
-            store_id: 0,
-            status: "true",
-            created_by: "admin",
-        },
-        validationSchema: Yup.object({
-            fullname: Yup.string().required("Fullname is required"),
-            email: Yup.string().email("Invalid email").required("Email is required"),
-            password: Yup.string().min(6, "Password must be at least 6 characters").nullable(),
-            role_id: Yup.number().required("Role is required"),
-            store_id: Yup.number().nullable(),
-            status: Yup.string().oneOf(["true", "false"]).required("Status is required"),
-        }),
-        onSubmit: async (values) => {
-            setLoading(true);
+        const fetchData = async () => {
             try {
-                await api.patch(`/users/update/${params.id}`, values);
-                toast.success('Successfully update admin!', {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: Bounce,
+                const { data } = await api.get(`/product/${params.id}`);
+                console.log(data.data)
+                setInitialValues({
+                    name: data.data.name || "",
+                    product_category_id: data.data.product_category_id || "",
+                    description: data.data.description || "",
+                    price: data.data.price || "",
+                    status: String(data.data.status) || "",
                 });
-                setTimeout(() => {
-                    router.back();
-                }, 3000)
-                
-            } catch (error: any) {
-                toast.error(error?.response?.data.message, {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: Bounce,
-                });
-            } finally {
-                setLoading(false);
+                if (data.data.productimages) {
+                    const imageUrls = data.data.productimages.map((image: any) => image.image_url);
+                    setSelectedImageUrls(imageUrls);
+                }
+            } catch (error) {
+                console.error("Error fetching product", error);
             }
-        },
-    });
+        };
+
+        const fetchCategories = async () => {
+            try {
+                const res = await api.get("/master-data/categories");
+                setCategory(res.data.data);
+            } catch (error) {
+                console.error("Error fetching categories", error);
+            }
+        };
+
+        fetchData();
+        fetchCategories();
+    }, [params.id]);
+
+    const handleSubmit = async (values: any, { resetForm }: any) => {
+        try {
+            const formData = new FormData();
+            formData.append("name", values.name);
+            formData.append("product_category_id", values.product_category_id);
+            formData.append("description", values.description);
+            formData.append("price", values.price);
+            formData.append("status", values.status);
+
+            selectedImages.forEach((file) => {
+                formData.append("images", file);
+            });
+
+            await api.patch(`/product/update/${params.id}`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            resetForm();
+            setSelectedImages([]);
+            toast.success("Berhasil memperbarui produk!");
+
+            setTimeout(() => {
+                router.back();
+            }, 3000);
+        } catch (error: any) {
+            toast.error(error?.response?.data.message);
+        }
+    };
+
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files) {
+            const newFiles = Array.from(files);
+
+            const validFiles = newFiles.filter(
+                (file) =>
+                    ["image/png", "image/jpeg", "image/gif"].includes(file.type) && file.size <= 1024 * 1024
+            );
+
+            if (validFiles.length !== newFiles.length) {
+                alert("Beberapa file tidak valid (hanya .jpg, .jpeg, .png, .gif dan maks 1MB)");
+            }
+
+            setSelectedImages((prev) => [...prev, ...validFiles]);
+        }
+    };
+
+    const removeImage = (index: number, fromUrls: boolean) => {
+        if (fromUrls) {
+            setSelectedImageUrls((prev) => prev.filter((_, i) => i !== index));
+        } else {
+            setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+        }
+    };
 
     return (
-        <div className="p-6 w-full mx-auto bg-white shadow-md rounded-lg">
-            <ToastContainer />
-            <button className="bg-gray-400 text-white py-1 px-3 rounded mt-2 mb-[30px]" onClick={() => router.back()}>Back</button>
-            <h1 className="text-xl font-bold mb-4">Edit Admin</h1>
-            <form onSubmit={formik.handleSubmit} className="space-y-4 mx-auto">
-                <div>
-                    <label className="block text-sm font-medium">Fullname</label>
-                    <input
-                        type="text"
-                        name="fullname"
-                        className="w-full border p-2 rounded"
-                        value={formik.values.fullname}
-                        onChange={formik.handleChange}
-                    />
-                    {formik.touched.fullname && formik.errors.fullname && (
-                        <p className="text-red-500 text-sm">{formik.errors.fullname}</p>
-                    )}
-                </div>
+        <div className="w-full mx-auto p-6 bg-white shadow-md rounded-lg">
+            <ToastContainer transition={Bounce} closeOnClick={true} autoClose={3000} hideProgressBar={false} theme="colored" position="top-right" />
+            <h2 className="text-2xl font-semibold mb-4">Edit Produk</h2>
 
-                <div>
-                    <label className="block text-sm font-medium">Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        className="w-full border p-2 rounded"
-                        value={formik.values.email}
-                        onChange={formik.handleChange}
-                    />
-                    {formik.touched.email && formik.errors.email && (
-                        <p className="text-red-500 text-sm">{formik.errors.email}</p>
-                    )}
-                </div>
+            <Formik
+                enableReinitialize={true}
+                initialValues={initialValues}
+                validationSchema={validationSchema}
+                onSubmit={handleSubmit}
+            >
+                {({ isSubmitting }) => (
+                    <Form>
+                        <div className="mb-3">
+                            <Field name="name" placeholder="Nama Produk" className="w-full p-2 border rounded" />
+                            <ErrorMessage name="name" component="div" className="text-red-500 text-sm mt-1" />
+                        </div>
 
-                <div>
-                    <label className="block text-sm font-medium">Password</label>
-                    <input
-                        type="text"
-                        name="password"
-                        className="w-full border p-2 rounded"
-                        value={formik.values.password}
-                        onChange={formik.handleChange}
-                        placeholder="leave it blank if you dont want to change password"
-                    />
-                    {formik.touched.password && formik.errors.password && (
-                        <p className="text-red-500 text-sm">{formik.errors.password}</p>
-                    )}
-                </div>
+                        <div className="mb-3">
+                            <Field as="select" name="product_category_id" className="w-full p-2 border rounded">
+                                <option value="">Pilih Category</option>
+                                {category.map((cat) => (
+                                    <option key={cat.id} value={cat.id}>
+                                        {cat.name}
+                                    </option>
+                                ))}
+                            </Field>
+                            <ErrorMessage name="product_category_id" component="div" className="text-red-500 text-sm mt-1" />
+                        </div>
 
-                <div>
-                    <label className="block text-sm font-medium">Role</label>
-                    <select
-                        name="role_id"
-                        className="w-full border p-2 rounded"
-                        value={formik.values.role_id}
-                        onChange={(e) => formik.setFieldValue("role_id", Number(e.target.value))} // Convert string to number
-                    >
-                        <option value="">Select Role</option>
-                        {roles.map((role) => (
-                            <option key={role.id} value={role.id}>
-                                {role.name}
-                            </option>
-                        ))}
-                    </select>
+                        <div className="mb-3">
+                            <Field as="textarea" name="description" placeholder="Deskripsi" className="w-full p-2 border rounded" />
+                            <ErrorMessage name="description" component="div" className="text-red-500 text-sm mt-1" />
+                        </div>
 
-                    {formik.touched.role_id && formik.errors.role_id && (
-                        <p className="text-red-500 text-sm">{formik.errors.role_id}</p>
-                    )}
-                </div>
+                        <div className="mb-3">
+                            <Field name="price" type="number" placeholder="Harga" className="w-full p-2 border rounded" />
+                            <ErrorMessage name="price" component="div" className="text-red-500 text-sm mt-1" />
+                        </div>
 
-                {formik.values.role_id === 2 && (
-                    <div>
-                        <label className="block text-sm font-medium">Store</label>
-                        <select
-                            name="store_id"
-                            className="w-full border p-2 rounded"
-                            value={formik.values.store_id}
-                            onChange={formik.handleChange}
-                        >
-                            <option value="">Select Store</option>
-                            {stores.map((store) => (
-                                <option key={store.id} value={store.id}>
-                                    {store.name}
-                                </option>
-                            ))}
-                        </select>
-                        {formik.touched.store_id && formik.errors.store_id && (
-                            <p className="text-red-500 text-sm">{formik.errors.store_id}</p>
-                        )}
-                    </div>
+                        <div className="mb-3">
+                            <Field as="select" name="status" className="w-full p-2 border rounded">
+                                <option value="">Pilih Status</option>
+                                <option value="true">Aktif</option>
+                                <option value="false">Tidak Aktif</option>
+                            </Field>
+                            <ErrorMessage name="status" component="div" className="text-red-500 text-sm mt-1" />
+                        </div>
+
+                        <div className="mb-3">
+                            <input type="file" multiple accept="image/png, image/jpeg, image/gif" onChange={handleImageChange} className="w-full p-2 border rounded" />
+
+                            <div className="mt-3 grid grid-cols-4 gap-2">
+                                {selectedImageUrls.map((url, index) => (
+                                    <div key={index} className="relative">
+                                        <img src={url} alt="preview" className="w-[200px] object-cover rounded border" />
+                                        <button type="button" onClick={() => removeImage(index, true)} className="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-bl">
+                                            X
+                                        </button>
+                                    </div>
+                                ))}
+
+                                {selectedImages.map((file, index) => (
+                                    <div key={index} className="relative">
+                                        <img src={URL.createObjectURL(file)} alt="preview" className="w-[200px] object-cover rounded border" />
+                                        <button type="button" onClick={() => removeImage(index, false)} className="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-bl">
+                                            X
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <button type="submit" disabled={isSubmitting} className="w-full p-3 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            {isSubmitting ? "Updating..." : "Simpan"}
+                        </button>
+                    </Form>
                 )}
-
-                <div>
-                    <label className="block text-sm font-medium">Status</label>
-                    <select
-                        name="status"
-                        className="w-full border p-2 rounded"
-                        value={formik.values.status}
-                        onChange={formik.handleChange}
-                    >
-                        <option value="true">Active</option>
-                        <option value="false">Inactive</option>
-                    </select>
-                </div>
-
-                <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white p-2 rounded mt-2"
-                    disabled={loading}
-                >
-                    {loading ? "Creating..." : "Submit"}
-                </button>
-            </form>
+            </Formik>
         </div>
     );
-};
-
-export default AdminForm;
+}

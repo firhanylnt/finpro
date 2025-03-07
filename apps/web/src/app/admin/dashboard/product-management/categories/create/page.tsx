@@ -58,7 +58,7 @@ const AdminForm = () => {
 
     return (
         <div className="p-6 w-full mx-auto bg-white shadow-md rounded-lg">
-            <ToastContainer />
+            <ToastContainer transition={Bounce} closeOnClick={true} autoClose={3000} hideProgressBar={false} theme="colored" position="top-right" />
             <button className="bg-gray-400 text-white py-1 px-3 rounded mt-2 mb-[30px]" onClick={() => router.back()}>Back</button>
             <h1 className="text-xl font-bold mb-4">Create Category</h1>
             <hr className="my-4"></hr>

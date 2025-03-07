@@ -4,11 +4,10 @@ import express, {
   Express,
   Request,
   Response,
-  NextFunction,
-  Router,
 } from 'express';
 import cors from 'cors';
 import { PORT, WEB_URL } from './config';
+
 import { AuthRouter } from './routers/auth.route';
 import { UsersRouter } from './routers/users.route';
 import { ProductRouter } from './routers/product.route';
@@ -16,9 +15,11 @@ import { ProductCategoryRouter } from './routers/productCategory.route';
 import { MasterDataRouter } from './routers/masterdata.route';
 import { DiscountRouter } from './routers/discount.route';
 import { StockRouter } from './routers/stock.route';
+import { StoreRouter } from './routers/store.route';
 
 import helmet from "helmet";
 import ErrorMiddleware from "./middlewares/errorMiddleware";
+
 
 
 export default class App {
@@ -49,6 +50,7 @@ export default class App {
     const productCategoryRouter = new ProductCategoryRouter();
     const discountRouter = new DiscountRouter();
     const stockRouter = new StockRouter();
+    const storeRouter = new StoreRouter();
     const masterDataRouter = new MasterDataRouter();
     
     this.app.get('/api', (req: Request, res: Response) => {
@@ -61,6 +63,7 @@ export default class App {
     this.app.use('/api/product-category', productCategoryRouter.getRouter());
     this.app.use('/api/discount', discountRouter.getRouter());
     this.app.use('/api/stock', stockRouter.getRouter());
+    this.app.use('/api/store', storeRouter.getRouter());
     this.app.use('/api/master-data', masterDataRouter.getRouter());
   }
 

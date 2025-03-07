@@ -17,6 +17,7 @@ const Sidebar = () => {
     const router = useRouter();
 
     useEffect(() => {
+        console.log(user);
         setIsClient(true);
     }, []);
 
@@ -35,36 +36,37 @@ const Sidebar = () => {
         <div className="flex">
             <div
                 className={`${isOpen ? "w-64" : "w-16"
-                    } bg-gray-900 h-screen p-5 pt-8 relative transition-all duration-300`}
+                    } bg-gray-900 h-screen p-5 m-2 pt-8 rounded-md relative transition-all duration-300`}
             >
                 <button className="absolute top-4 right-4 text-white" onClick={toggleSidebar}>
                     {isOpen ? <Menu size={24} /> : <Menu size={24} />}
                 </button>
 
                 <ul className="mt-10 space-y-2 text-sm">
-                    <li className="text-lg text-white mb-[30px]">Hi, {user?.name}</li>
-                    <SidebarItem href="/admin/dashboard" icon={<LayoutDashboard size={20} />} text={user?.name} isOpen={isOpen} />
+                    <li className=" text-center text-lg text-white mb-[30px]">Hi, {user?.name}</li>
                     <SidebarItem href="/admin/dashboard" icon={<LayoutDashboard size={20} />} text="Dashboard" isOpen={isOpen} />
 
-                    <li>
-                        <button
-                            onClick={() => setIsUserManagementOpen(!isUserManagementOpen)}
-                            className="flex items-center justify-between w-full text-white p-2 hover:bg-gray-700 rounded text-sm"
-                        >
-                            <div className="flex items-center space-x-4">
-                                <Users size={20} />
-                                {isOpen && <span>User Management</span>}
-                            </div>
-                            {isOpen && (isUserManagementOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
-                        </button>
+                    {user?.role === 1 && (
+                        <li>
+                            <button
+                                onClick={() => setIsUserManagementOpen(!isUserManagementOpen)}
+                                className="flex items-center justify-between w-full text-white p-2 hover:bg-gray-700 rounded text-sm"
+                            >
+                                <div className="flex items-center space-x-4">
+                                    <Users size={20} />
+                                    {isOpen && <span>User Management</span>}
+                                </div>
+                                {isOpen && (isUserManagementOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+                            </button>
 
-                        {isUserManagementOpen && (
-                            <ul className="ml-6 space-y-2 text-xs">
-                                <SidebarItem href="/admin/dashboard/user-management/admin" icon={<Users size={18} />} text="Admins" isOpen={isOpen} />
-                                <SidebarItem href="/admin/dashboard/user-management/user" icon={<Users size={18} />} text="Users" isOpen={isOpen} />
-                            </ul>
-                        )}
-                    </li>
+                            {isUserManagementOpen && (
+                                <ul className="ml-6 space-y-2 text-xs">
+                                    <SidebarItem href="/admin/dashboard/user-management/admin" icon={<Users size={18} />} text="Admins" isOpen={isOpen} />
+                                    <SidebarItem href="/admin/dashboard/user-management/user" icon={<Users size={18} />} text="Users" isOpen={isOpen} />
+                                </ul>
+                            )}
+                        </li>
+                    )}
 
                     <li>
                         <button
@@ -87,11 +89,13 @@ const Sidebar = () => {
                     </li>
 
                     <SidebarItem href="/admin/dashboard/inventory-management" icon={<LayoutDashboard size={20} />} text="Inventory Management" isOpen={isOpen} />
-                    <SidebarItem href="/admin/dashboard/store-management" icon={<LayoutDashboard size={20} />} text="Store Management" isOpen={isOpen} />
+                    {user?.role === 1 && (
+                        <SidebarItem href="/admin/dashboard/store-management" icon={<LayoutDashboard size={20} />} text="Store Management" isOpen={isOpen} />
+                    )}
+                    
                     <SidebarItem href="/admin/dashboard/discount-management" icon={<LayoutDashboard size={20} />} text="Discount" isOpen={isOpen} />
                     <SidebarItem href="/admin/dashboard/report" icon={<LayoutDashboard size={20} />} text="Report" isOpen={isOpen} />
                     <Link className="flex items-center space-x-4 text-white p-2 hover:bg-gray-700 rounded text-sm" href="#" onClick={Handlelogout}>Logout</Link>
-
                 </ul>
             </div>
         </div>

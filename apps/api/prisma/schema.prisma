@@ -52,11 +52,11 @@ model Users {
   fullname     String
   email        String         @unique
   password     String
-  phone_number Int
+  phone_number String
   status       Boolean        @default(true)
   is_verified  Boolean
-  fb_token     String
-  gmail_token  String
+  fb_token     String?
+  gmail_token  String?
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   deletedAt    DateTime?
@@ -79,19 +79,19 @@ model Roles {
 }
 
 model Stores {
-  id              Int               @id @default(autoincrement())
-  name            String            @unique
-  lat             String
-  long            String
-  description     String
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  deletedAt       DateTime?
-  createdBy       Int?
-  updatedBy       Int?
-  deletedBy       Int?
-  admin           Admins[]
-  productdiscount ProductDiscount[]
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  lat         String
+  long        String
+  description String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+  createdBy   Int?
+  updatedBy   Int?
+  deletedBy   Int?
+  admin       Admins[]
+  discount    Discount[]
 }
 
 model Products {
@@ -138,12 +138,10 @@ model ProductImages {
 
 model ProductDiscount {
   id          Int      @id @default(autoincrement())
+  discount_id Int
   product_id  Int
-  store_id    Int
-  amount_type String
-  amount      Decimal
   products    Products @relation(fields: [product_id], references: [id])
-  stores      Stores   @relation(fields: [store_id], references: [id])
+  discount    Discount @relation(fields: [discount_id], references: [id])
 }
 
 model Stock {
@@ -177,19 +175,27 @@ model JurnalStock {
 }
 
 model Discount {
-  id               Int          @id @default(autoincrement())
+  id               Int               @id @default(autoincrement())
   name             String
+  coupon           String?
+  store_id         Int?
   discount_type_id Int
+  amount           Float?
+  min_purchase     Float?
+  max_discount     Float?
   status           Boolean
   start_date       DateTime
   end_date         DateTime
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   deletedAt        DateTime?
   createdBy        Int?
   updatedBy        Int?
   deletedBy        Int?
-  discounttype     DiscountType @relation(fields: [discount_type_id], references: [id])
+  discounttype     DiscountType      @relation(fields: [discount_type_id], references: [id])
+  stores           Stores?           @relation(fields: [store_id], references: [id])
+  productdiscount  ProductDiscount[]
+  Transactions     Transactions[]
 }
 
 model DiscountType {
@@ -215,7 +221,8 @@ model Transactions {
   user_id             Int
   address_id          Int
   amount              Decimal
-  discount            Decimal
+  discount_id         Int?
+  discount_amount     Decimal
   tax                 Decimal
   admin_fee           Decimal
   shipping_cost       Decimal
@@ -231,6 +238,7 @@ model Transactions {
   deletedBy           Int?
   users               Users                 @relation(fields: [user_id], references: [id])
   paymentmethod       PaymentMethod         @relation(fields: [payment_method_id], references: [id])
+  discount            Discount?             @relation(fields: [discount_id], references: [id])
   TransactionsDetails TransactionsDetails[]
 }
 

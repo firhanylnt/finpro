@@ -14,8 +14,9 @@ export class StockRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post('/create', VerifyToken, AdminGuard, this.stockController.create);
-    this.router.patch('/update/:id', VerifyToken, AdminGuard, this.stockController.update);
+    this.router.get('/', VerifyToken ,this.stockController.getAll);
+    this.router.post('/create', VerifyToken, this.stockController.create);
+    this.router.patch('/update/:id', VerifyToken, this.stockController.update);
   }
 
   getRouter(): Router {
