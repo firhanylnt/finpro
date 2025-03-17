@@ -86,7 +86,7 @@ const createDiscount = () => {
                         name="discount_type_id"
                         getOptionLabel={(e) => e.name}
                         getOptionValue={(e) => String(e.id)}
-                        onChange={(selectedOption) => formik.setFieldValue("discount_type_id", String(selectedOption?.id))}
+                        onChange={(selectedOption) => formik.setFieldValue("discount_type_id", Number(selectedOption?.id))}
                         value={discountType.find((option) => option.id === Number(formik.values.discount_type_id)) || null}
                     />
                     {formik.touched.discount_type_id && formik.errors.discount_type_id && (
@@ -118,7 +118,7 @@ const createDiscount = () => {
                         name="store_id"
                         getOptionLabel={(e) => e.name}
                         getOptionValue={(e) => String(e.id)}
-                        onChange={(selectedOption) => formik.setFieldValue("store_id", String(selectedOption?.id))}
+                        onChange={(selectedOption) => formik.setFieldValue("store_id", Number(selectedOption?.id))}
                         value={stores.find((option) => option.id === Number(formik.values.store_id)) || null}
                     />
                     {formik.touched.store_id && formik.errors.store_id && (
@@ -134,7 +134,7 @@ const createDiscount = () => {
                         name="product_id"
                         getOptionLabel={(e) => e.name}
                         getOptionValue={(e) => String(e.id)}
-                        onChange={(selectedOption) => formik.setFieldValue("product_id", String(selectedOption?.id))}
+                        onChange={(selectedOption) => formik.setFieldValue("product_id", Number(selectedOption?.id))}
                         value={products.find((option) => option.id === Number(formik.values.product_id)) || null}
                     />
                     {formik.touched.product_id && formik.errors.product_id && (

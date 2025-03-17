@@ -3,34 +3,6 @@ import Link from "next/link";
 export const Footer = () => {
   return (
     <>
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
       <footer className="text-center text-sm sm:mt-4">
         <div className="flex justify-center gap-12 text-2xl"></div>
         <span>© </span>2025{" "}

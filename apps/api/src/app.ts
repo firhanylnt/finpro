@@ -19,8 +19,8 @@ import { StoreRouter } from './routers/store.route';
 
 import helmet from "helmet";
 import ErrorMiddleware from "./middlewares/errorMiddleware";
-
-
+import { ProductSearchRouter } from './routers/productSearch.route';
+import { ReportRouter } from './routers/report.route';
 
 export default class App {
   private app: Express;
@@ -52,6 +52,8 @@ export default class App {
     const stockRouter = new StockRouter();
     const storeRouter = new StoreRouter();
     const masterDataRouter = new MasterDataRouter();
+    const productSearchRouter = new ProductSearchRouter();
+    const reportRouter = new ReportRouter();
     
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -65,6 +67,8 @@ export default class App {
     this.app.use('/api/stock', stockRouter.getRouter());
     this.app.use('/api/store', storeRouter.getRouter());
     this.app.use('/api/master-data', masterDataRouter.getRouter());
+    this.app.use('/api/user/product', productSearchRouter.getRouter());
+    this.app.use('/api/report', reportRouter.getRouter());
   }
 
   public start(): void {

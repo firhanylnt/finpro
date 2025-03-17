@@ -220,6 +220,7 @@ model Transactions {
   code                String
   user_id             Int
   address_id          Int
+  store_id            Int                   @default(1)
   amount              Decimal
   discount_id         Int?
   discount_amount     Decimal

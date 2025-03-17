@@ -1,6 +1,27 @@
 export interface Product {
     id: number;
     name: string;
+    price: string;
+    description: string;
+    productcategory: {
+      name: string;
+    }
+    stock: Stock[],
+    productdiscount: ProductDiscount[],
+    productimages: ProductImage[],
+}
+
+interface Stock {
+  id: number;
+  qty: number;
+  store_id: number;
+}
+
+interface ProductDiscount {
+  discount: {
+    amount: number;
+    discount_type_id: number;
+  }
 }
 
 export interface Categories {

@@ -29,7 +29,6 @@ export default function ProductForm() {
         const fetchData = async () => {
             try {
                 const { data } = await api.get(`/product/${params.id}`);
-                console.log(data.data)
                 setInitialValues({
                     name: data.data.name || "",
                     product_category_id: data.data.product_category_id || "",

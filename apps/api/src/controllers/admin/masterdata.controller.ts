@@ -39,10 +39,27 @@ export class MasterDataController {
 
     async get_product(req: Request, res: Response, next: NextFunction) {
         try {
-            const data = await prisma.products.findMany({
-                where: {deletedAt: null},
-                orderBy: {id: 'desc'}
-            });
+            const { storeId, categoryId } = req.query;
+            let data = null;
+            if(storeId || categoryId) {
+                data = await prisma.products.findMany({
+                    where: {
+                        stock: {
+                            some: {
+                                store_id: storeId ? Number(storeId) : {not: 0}
+                            }
+                        },
+                        product_category_id: categoryId ? Number(categoryId) : {not: 0},
+                        deletedAt: null,
+                    },
+                    orderBy: {id: 'desc'}
+                })
+            } else {
+                data = await prisma.products.findMany({
+                    where: {deletedAt: null},
+                    orderBy: {id: 'desc'}
+                });
+            }
 
             res.status(200).send({
                 message: 'Get All Products',

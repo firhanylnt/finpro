@@ -7,7 +7,6 @@ export default function ErrorMiddleware(
   next: NextFunction
 ) {
 
-  console.log('error')
   res.status(500).send({
     message: err.message,
   });

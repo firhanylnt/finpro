@@ -24,7 +24,6 @@ const StockForm = () => {
     useEffect(() => {
         fetchProducts();
         fetchStores();
-        console.log(user.store)
         if(user.store === null){
             setDisabled(false)
             formik.setFieldValue("store_id", Number(localStorage.getItem("storeId")));

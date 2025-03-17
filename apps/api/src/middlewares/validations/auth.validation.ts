@@ -32,7 +32,6 @@ export const RegisterValidation = [
     (req: Request, res: Response, next: NextFunction) => {
         try {
             const errors = validationResult(req);
-            console.log(errors);
 
             if (!errors.isEmpty()) throw new Error(errors.array()[0].msg);
 
@@ -54,7 +53,6 @@ export const LoginValidation = [
     (req: Request, res: Response, next: NextFunction) => {
         try {
             const errors = validationResult(req);
-            console.log(errors);
 
             if (!errors.isEmpty()) throw new Error(errors.array()[0].msg);
 

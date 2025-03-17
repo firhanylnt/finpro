@@ -11,13 +11,13 @@ const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(true);
     const [isClient, setIsClient] = useState(false);
     const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
+    const [isReportOpen, setIsReportOpen] = useState(false);
     const [isProductManagementOpen, setIsProductManagementOpen] = useState(false);
     const user = useSelector((state: any) => state.auth.user);
     const dispatch = useDispatch();
     const router = useRouter();
 
     useEffect(() => {
-        console.log(user);
         setIsClient(true);
     }, []);
 
@@ -94,7 +94,28 @@ const Sidebar = () => {
                     )}
                     
                     <SidebarItem href="/admin/dashboard/discount-management" icon={<LayoutDashboard size={20} />} text="Discount" isOpen={isOpen} />
-                    <SidebarItem href="/admin/dashboard/report" icon={<LayoutDashboard size={20} />} text="Report" isOpen={isOpen} />
+                    <li>
+                        <button
+                            onClick={() => setIsReportOpen(!isReportOpen)}
+                            className="flex items-center justify-between w-full text-white p-2 hover:bg-gray-700 rounded text-sm"
+                        >
+                            <div className="flex items-center space-x-4">
+                                <Users size={20} />
+                                {isOpen && <span>Reports</span>}
+                            </div>
+                            {isOpen && (isReportOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+                        </button>
+
+                        {isReportOpen && (
+                            <ul className="ml-6 space-y-2 text-xs">
+                                <SidebarItem href="/admin/dashboard/report" icon={<LayoutDashboard size={20} />} text="Transactions" isOpen={isOpen} />
+                                <SidebarItem href="/admin/dashboard/report-stock" icon={<LayoutDashboard size={20} />} text="Stocks" isOpen={isOpen} />
+                                {/* <SidebarItem href="/admin/dashboard/product-management/products" icon={<Users size={18} />} text="Products" isOpen={isOpen} />
+                                <SidebarItem href="/admin/dashboard/product-management/categories" icon={<Users size={18} />} text="Product Category" isOpen={isOpen} /> */}
+                            </ul>
+                        )}
+                    </li>
+                    {/* <SidebarItem href="/admin/dashboard/report" icon={<LayoutDashboard size={20} />} text="Report" isOpen={isOpen} /> */}
                     <Link className="flex items-center space-x-4 text-white p-2 hover:bg-gray-700 rounded text-sm" href="#" onClick={Handlelogout}>Logout</Link>
                 </ul>
             </div>

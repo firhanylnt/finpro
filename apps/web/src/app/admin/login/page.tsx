@@ -21,7 +21,6 @@ export default function LoginPage() {
     try {
       const response = await api.post("/auth/login", { email, password });
       const { token } = response.data;
-      console.log(token)
 
       Cookies.set("access_token", token, { expires: 1 });
       dispatch(setAuth({ token }));

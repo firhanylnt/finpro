@@ -23,7 +23,6 @@ async function VerifyToken(req: AuthenticatedRequest, res: Response, next: NextF
 
 async function AdminGuard(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
-    console.log(req.admin?.role);
     if (String(req.admin?.role) !== "1") throw new Error("Not an Super Admin");
 
     next();

@@ -21,10 +21,10 @@ const discountList = () => {
   const searchParams = useSearchParams();
   const user = useSelector((state: any) => state.auth.user);
 
+  const [storeId, setStoreId] = useState<number | null>(searchParams.get("storeId") || user?.store || localStorage.getItem("storeId") || null);
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "name");
   const [discountTypeId, setdiscountTypeId] = useState(searchParams.get("discount_type_id") || "");
-  const [storeId, setStoreId] = useState(searchParams.get("store_id") || "");
   const [sortOrder, setSortOrder] = useState(searchParams.get("sortOrder") || "asc");
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
 
@@ -65,7 +65,7 @@ const discountList = () => {
 
   const handleFilterChange = (field: "discount_type_id" | "store_id", value: string) => {
     if (field === "discount_type_id") setdiscountTypeId(value);
-    if (field === "store_id") setStoreId(value);
+    if (field === "store_id") setStoreId(Number(value));
     updateQueryParams({ [field]: value, page: 1 });
     fetchData(search, field === "discount_type_id" ? value : discountTypeId, field === "store_id" ? value : storeId, sortBy, sortOrder, 1);
   };
@@ -85,30 +85,30 @@ const discountList = () => {
 
   const fetchDiscountType = async () => {
     try {
-        const res = await api.get("/master-data/discount-type");
-        setDiscountType(res.data.data);
+      const res = await api.get("/master-data/discount-type");
+      setDiscountType(res.data.data);
     } catch (error) {
-        console.error("Error fetching roles", error);
+      console.error("Error fetching roles", error);
     }
-};
+  };
 
-const fetchStores = async () => {
+  const fetchStores = async () => {
     try {
-        const res = await api.get("/master-data/stores");
-        setStores(res.data.data);
+      const res = await api.get("/master-data/stores");
+      setStores(res.data.data);
     } catch (error) {
-        console.error("Error fetching stores", error);
+      console.error("Error fetching stores", error);
     }
-};
+  };
 
-useEffect(() => {
-  fetchDiscountType();
-  fetchStores()
-}, []);
+  useEffect(() => {
+    fetchDiscountType();
+    fetchStores()
+  }, []);
 
-useEffect(() => {
-  fetchData(search, discountTypeId, storeId, sortBy, sortOrder, page);
-}, [search, discountTypeId, storeId, sortBy, sortOrder, page]);
+  useEffect(() => {
+    fetchData(search, discountTypeId, storeId, sortBy, sortOrder, page);
+  }, [search, discountTypeId, storeId, sortBy, sortOrder, page]);
 
   return (
     <div className="w-full mx-[30px] mt-[30px]">
@@ -119,9 +119,9 @@ useEffect(() => {
         </div>
       )}
 
-<div className="grid grid-cols-12 gap-4">
-        <div className="col-span-7">
-          <SearchInput value={search} onChange={handleSearch} placeholder="Search by name..." />
+      <div className="grid grid-cols-12 gap-4">
+        <div className="col-span-6">
+          <SearchInput value={search} onChange={handleSearch} placeholder="Search ..." />
         </div>
         <div className="col-span-3">
           <Select
@@ -134,17 +134,20 @@ useEffect(() => {
             isClearable={true}
           />
         </div>
-        <div className="col-span-2">
-          <Select
-            options={stores}
-            getOptionLabel={(e) => e.name}
-            getOptionValue={(e) => String(e.id)}
-            value={stores.find(s => s.id === Number(storeId)) || null}
-            onChange={(e) => handleFilterChange("store_id", e ? String(e.id) : "")}
-            placeholder="Filter by Store"
-            isClearable={true}
-          />
-        </div>
+        {user?.store == null && (
+            <div className="col-span-3">
+              <Select
+                options={stores}
+                getOptionLabel={(e) => e.name}
+                getOptionValue={(e) => String(e.id)}
+                value={stores.find(s => s.id === Number(storeId)) || null}
+                onChange={(e) => handleFilterChange("store_id", e ? String(e.id) : "")}
+                placeholder="Filter by Store"
+                isClearable={true}
+              />
+            </div>
+        )}
+        
       </div>
 
       <div className="overflow-x-auto bg-white shadow-md rounded-lg">
@@ -184,7 +187,7 @@ useEffect(() => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={3} className="p-4 text-center text-gray-500">Loading...</td>
+                <td colSpan={9} className="p-4 text-center text-gray-500">Loading...</td>
               </tr>
             ) : discounts.length > 0 ? (
               discounts.map((discount: Discount) => (
@@ -206,7 +209,7 @@ useEffect(() => {
                       <DeleteConfirmation
                         apiUrl="/discount/delete"
                         itemId={discount.id}
-                        onDeleteSuccess={() => {fetchData(search, discountTypeId, storeId, sortBy, sortOrder, page)}}
+                        onDeleteSuccess={() => { fetchData(search, discountTypeId, storeId, sortBy, sortOrder, page) }}
                       />
                     </td>
                   )}
@@ -215,7 +218,7 @@ useEffect(() => {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="p-4 text-center text-gray-500">No data found</td>
+                <td colSpan={9} className="p-4 text-center text-gray-500">No data found</td>
               </tr>
             )}
           </tbody>
