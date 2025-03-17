@@ -11,12 +11,12 @@ import "react-toastify/dist/ReactToastify.css";
 import Pagination from "@/components/admin/pagination";
 import SearchInput from "@/components/admin/search";
 import Select from "react-select";
-import { Categories, Product, ProductList } from "@/features/types/product";
+import { Categories, ProductList } from "@/features/types/product";
 import { debounce } from "lodash";
 
 const ProductListPage = () => {
-  const router = useRouter();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const user = useSelector((state: any) => state.auth.user);
 
   const [search, setSearch] = useState(searchParams.get("search") || "");
@@ -41,28 +41,32 @@ const ProductListPage = () => {
         console.error("Error fetching product:", error);
       }
       setLoading(false);
-
     }, 500), []
   );
 
   const updateQueryParams = (params: Record<string, string | number>) => {
-    const newParams = new URLSearchParams(searchParams.toString());
+    const currentUrl = new URL(window.location.href);
     Object.keys(params).forEach((key) => {
-      if (params[key]) newParams.set(key, String(params[key]));
-      else newParams.delete(key);
+      if (params[key]) {
+        currentUrl.searchParams.set(key, String(params[key]));
+      } else {
+        currentUrl.searchParams.delete(key);
+      }
     });
-    router.push(`?${newParams.toString()}`);
+    window.history.pushState({}, "", currentUrl);
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    updateQueryParams({ search: e.target.value, page: 1 });
+    const newValue = e.target.value;
+    setSearch(newValue);
+    updateQueryParams({ search: newValue, page: 1 });
+    fetchData(newValue, categoryId, sortBy, sortOrder, 1);
   };
 
   const handleFilterChange = (field: "category_id", value: string) => {
     if (field === "category_id") setCategoryId(value);
     updateQueryParams({ [field]: value, page: 1 });
-    fetchData(search, field === "category_id" ? value : categoryId, sortBy, sortOrder, 1);
+    fetchData(search, value, sortBy, sortOrder, 1);
   };
 
   const handleSort = (field: string) => {
@@ -70,12 +74,14 @@ const ProductListPage = () => {
     setSortBy(field);
     setSortOrder(newSortOrder);
     updateQueryParams({ sortBy: field, sortOrder: newSortOrder });
+    fetchData(search, categoryId, field, newSortOrder, 1);
   };
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1) return;
     setPage(newPage);
     updateQueryParams({ page: newPage });
+    fetchData(search, categoryId, sortBy, sortOrder, newPage);
   };
 
   const fetchCategories = async () => {
@@ -125,31 +131,24 @@ const ProductListPage = () => {
         <table className="w-full border-collapse border-gray-900">
           <thead>
             <tr className="bg-gray-900 text-left text-white border-gray-900">
-              <th className="border p-3">
-                Image
-              </th>
+              <th className="border p-3">Image</th>
               <th className="border p-3 cursor-pointer" onClick={() => handleSort("name")}>
                 Product Name {sortBy === "name" && (sortOrder === "asc" ? "▲" : "▼")}
               </th>
               <th className="border p-3 cursor-pointer" onClick={() => handleSort("price")}>
                 Price {sortBy === "price" && (sortOrder === "asc" ? "▲" : "▼")}
               </th>
-              <th className="border p-3 cursor-pointer">
-                Category
-              </th>
+              <th className="border p-3">Category</th>
               <th className="border p-3 cursor-pointer" onClick={() => handleSort("createdAt")}>
                 Created At {sortBy === "createdAt" && (sortOrder === "asc" ? "▲" : "▼")}
               </th>
-              {user?.role === 1 && (
-                <th className="border p-3">Action</th>
-              )}
-
+              {user?.role === 1 && <th className="border p-3">Action</th>}
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={3} className="p-4 text-center text-gray-500">Loading...</td>
+                <td colSpan={6} className="p-4 text-center text-gray-500">Loading...</td>
               </tr>
             ) : products.length > 0 ? (
               products.map((product: ProductList) => (
@@ -172,7 +171,6 @@ const ProductListPage = () => {
                       />
                     </td>
                   )}
-
                 </tr>
               ))
             ) : (
@@ -183,6 +181,7 @@ const ProductListPage = () => {
           </tbody>
         </table>
       </div>
+
       <Pagination page={page} onPageChange={handlePageChange} />
     </div>
   );

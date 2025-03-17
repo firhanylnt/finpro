@@ -30,10 +30,6 @@ const CategoriesListPage = () => {
   const [category, setCategory] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, [searchParams.toString()]);
-
   const fetchData = async () => {
     setLoading(true);
     const query = new URLSearchParams({ search, sortBy, sortOrder, page: page.toString() }).toString();
@@ -69,6 +65,10 @@ const CategoriesListPage = () => {
     setPage(newPage);
     updateQueryParams({ page: newPage });
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [searchParams.toString()]);
 
   return (
     <div className="w-full mx-[30px] mt-[30px]">

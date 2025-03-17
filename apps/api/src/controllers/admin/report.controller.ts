@@ -2,7 +2,7 @@ import { Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "@/custom";
 import { PrismaClient } from "@prisma/client";
 import { getAllData, perCategory, perProduct } from "@/services/report.service";
-import { jurnalStock } from "@/services/reportStock.service";
+import { detailJurnal, jurnalStock } from "@/services/reportStock.service";
 const prisma = new PrismaClient();
 
 export class ReportController {
@@ -32,7 +32,7 @@ export class ReportController {
 
             res.status(200).send({
                 message: 'Get All Report',
-                data : {
+                data: {
                     all,
                     product,
                     category
@@ -51,7 +51,7 @@ export class ReportController {
                 storeId?: number;
             }
 
-            const { startMonth, endMonth, storeId, productId, categoryId } = req.query;
+            const { search, startMonth, endMonth, storeId } = req.query;
 
             const filter: IFilter = {
                 startMonth: startMonth ? String(startMonth) : "",
@@ -70,4 +70,36 @@ export class ReportController {
         }
     }
 
+    async detailStock(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+
+        try {
+
+            const { id } = req.params;
+
+            interface IFilter {
+                startMonth?: string;
+                endMonth?: string;
+                storeId?: number;
+            }
+
+            const { startMonth, endMonth, storeId } = req.query;
+
+            const filter: IFilter = {
+                startMonth: startMonth ? String(startMonth) : "",
+                endMonth: endMonth ? String(endMonth) : "",
+                storeId: parseInt(storeId as string) || undefined,
+            };
+
+            const data = await detailJurnal(Number(id), filter);
+
+            res.status(200).send({
+                message: 'Get All Report',
+                data
+            })
+
+        } catch (error) {
+            next(error);
+        }
+
+    }
 }

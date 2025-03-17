@@ -12,7 +12,7 @@ export const Footer = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          PT. Baralanja Sejahtera
+          beliaja.com
         </Link>
         . All Rights Reserved.
       </footer>

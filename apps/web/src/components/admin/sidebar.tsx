@@ -110,12 +110,9 @@ const Sidebar = () => {
                             <ul className="ml-6 space-y-2 text-xs">
                                 <SidebarItem href="/admin/dashboard/report" icon={<LayoutDashboard size={20} />} text="Transactions" isOpen={isOpen} />
                                 <SidebarItem href="/admin/dashboard/report-stock" icon={<LayoutDashboard size={20} />} text="Stocks" isOpen={isOpen} />
-                                {/* <SidebarItem href="/admin/dashboard/product-management/products" icon={<Users size={18} />} text="Products" isOpen={isOpen} />
-                                <SidebarItem href="/admin/dashboard/product-management/categories" icon={<Users size={18} />} text="Product Category" isOpen={isOpen} /> */}
                             </ul>
                         )}
                     </li>
-                    {/* <SidebarItem href="/admin/dashboard/report" icon={<LayoutDashboard size={20} />} text="Report" isOpen={isOpen} /> */}
                     <Link className="flex items-center space-x-4 text-white p-2 hover:bg-gray-700 rounded text-sm" href="#" onClick={Handlelogout}>Logout</Link>
                 </ul>
             </div>

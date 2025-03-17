@@ -15,6 +15,7 @@ export class ReportRouter {
   private initializeRoutes(): void {
     this.router.get('/', this.report.getAll);
     this.router.get('/stock', this.report.getStock);
+    this.router.get('/stock/:id', this.report.detailStock);
   }
 
   getRouter(): Router {

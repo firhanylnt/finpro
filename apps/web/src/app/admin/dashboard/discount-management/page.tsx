@@ -16,7 +16,7 @@ import DiscountType from "@/features/types/discountType";
 import { debounce } from "lodash";
 import Select from "react-select";
 
-const discountList = () => {
+const DiscountList = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const user = useSelector((state: any) => state.auth.user);
@@ -113,11 +113,9 @@ const discountList = () => {
   return (
     <div className="w-full mx-[30px] mt-[30px]">
       <h1 className="text-2xl mb-6 text-gray-800">discounts</h1>
-      {user?.role === 1 && (
-        <div className="my-4">
+      <div className="my-4">
           <Link href={'/admin/dashboard/discount-management/create'} className="bg-green-500 py-2 px-4 mr-4 rounded-md text-white">+ Create</Link>
         </div>
-      )}
 
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-6">
@@ -229,4 +227,4 @@ const discountList = () => {
   );
 };
 
-export default discountList;
+export default DiscountList;

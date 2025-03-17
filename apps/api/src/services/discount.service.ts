@@ -6,13 +6,16 @@ export const createDiscount = async (req: any) => {
         const { name, discount_type_id, product_id, store_id, coupon, amount, min_purchase, max_discount, start_date, end_date, status } = req.body;
         
         const checkExist = await prisma.discount.findFirst({
-            where: { 
-                store_id: Number(store_id),
-                start_date: new Date(start_date),
-                end_date: new Date(end_date),
-                productdiscount: {some: {product_id: product_id}}
+            where: {
+              store_id: Number(store_id),
+              productdiscount: { some: { product_id: product_id } },
+              AND: [
+                { start_date: { lte: new Date(start_date) } },
+                { end_date: { gte: new Date(end_date) } },
+              ],
             },
-        });
+          });
+          
 
         if (checkExist) throw new Error("Discount sudah terdaftar");
 

@@ -111,7 +111,6 @@ const ReportPage = () => {
         <input type="month" {...register("startMonth")} className="border p-2" />
         <input type="month" {...register("endMonth")} className="border p-2" />
 
-        {/* Store Select */}
         <Controller
           control={control}
           name="storeId"
@@ -128,7 +127,6 @@ const ReportPage = () => {
           )}
         />
 
-        {/* Category Select */}
         <Controller
           control={control}
           name="categoryId"
@@ -145,7 +143,6 @@ const ReportPage = () => {
           )}
         />
 
-        {/* Product Select */}
         <Controller
           control={control}
           name="productId"
@@ -167,7 +164,6 @@ const ReportPage = () => {
         </button>
       </form>
 
-      {/* Chart Section */}
       <ResponsiveContainer width="100%" height={400}>
         <LineChart width={600} height={300} data={data}>
           <XAxis
@@ -187,8 +183,8 @@ const ReportPage = () => {
         </LineChart>
       </ResponsiveContainer>
 
-      <div className="flex flex-2 gap-4">
-        <div>
+      <div className="grid grid-cols-12 gap-4">
+        <div className="col-span-6">
           <h1>Total Transaction by Product</h1>
           <table className="w-full border border-gray-300 shadow-md rounded-lg">
             <thead>
@@ -215,7 +211,7 @@ const ReportPage = () => {
 
         </div>
 
-        <div>
+        <div className="col-span-6">
         <h1>Total Transaction by Categories</h1>
           <table className="w-full border border-gray-300 shadow-md rounded-lg">
             <thead>

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback, Key } from "react";
 import useEmblaCarousel from "embla-carousel-react";
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductDetail = ({ product }: any) => {
   const [quantity, setQuantity] = useState(1);
@@ -10,7 +12,7 @@ const ProductDetail = ({ product }: any) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const handleAddToCart = () => {
-    alert(`Added ${quantity} ${product.products.name} to cart!`);
+    toast.success(`Added ${quantity} ${product.products.name} to cart!`);
   };
 
   useEffect(() => {
@@ -25,6 +27,7 @@ const ProductDetail = ({ product }: any) => {
 
   return (
     <div className="max-w-6xl mx-auto py-6 px-4 md:px-6">
+      <ToastContainer transition={Bounce} closeOnClick={true} autoClose={3000} hideProgressBar={false} theme="colored" position="top-right" />
       <nav className="text-xs md:text-sm text-gray-500 mb-4">
         Home &gt; {product.products.productcategory.name} &gt;{" "}
         <span className="text-red-500 font-semibold">{product.products.name}</span>

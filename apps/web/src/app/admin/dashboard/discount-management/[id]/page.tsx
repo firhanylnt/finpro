@@ -12,20 +12,13 @@ import Store from "@/features/types/store";
 import DiscountType from "@/features/types/discountType";
 import Select from "react-select";
 
-const editDiscount = () => {
+const EditDiscount = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [stores, setStores] = useState<Store[]>([]);
     const [discountType, setDiscountType] = useState<DiscountType[]>([]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const params = useParams();
-
-    useEffect(() => {
-        fetchData();
-        fetchProducts();
-        fetchStores();
-        fetchDiscountType();
-    }, []);
 
     const fetchData = async () => {
         try {
@@ -96,6 +89,13 @@ const editDiscount = () => {
             }
         },
     });
+
+    useEffect(() => {
+        fetchData();
+        fetchProducts();
+        fetchStores();
+        fetchDiscountType();
+    }, []);
 
     return (
         <div className="p-6 w-full mx-auto bg-white shadow-md rounded-lg">
@@ -223,4 +223,4 @@ const editDiscount = () => {
     );
 };
 
-export default editDiscount;
+export default EditDiscount;

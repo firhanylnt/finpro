@@ -10,14 +10,14 @@ import "react-toastify/dist/ReactToastify.css";
 import Pagination from "@/components/admin/pagination";
 import SearchInput from "@/components/admin/search";
 import { useSelector } from "react-redux";
-import Stock from "@/features/types/stock";
+import { Stock } from "@/features/types/stock";
 import Select from "react-select";
 import Store from "@/features/types/store";
 
 const CategoriesListPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const user = useSelector((state: any) => state.auth.user); 
+  const user = useSelector((state: any) => state.auth.user);
 
   const [storeId, setStoreId] = useState<number | null>(searchParams.get("storeId") || user?.store || localStorage.getItem("storeId") || null);
   const [search, setSearch] = useState(searchParams.get("search") || "");
@@ -32,7 +32,7 @@ const CategoriesListPage = () => {
   useEffect(() => {
     fetchData();
     fetchStores();
-    if(user.store === null) {
+    if (user.store === null) {
       setDisabled(false);
     }
   }, [searchParams.toString()]);
@@ -49,12 +49,12 @@ const CategoriesListPage = () => {
 
   const fetchStores = async () => {
     try {
-        const res = await api.get("/master-data/stores");
-        setStores(res.data.data);
+      const res = await api.get("/master-data/stores");
+      setStores(res.data.data);
     } catch (error) {
-        console.error("Error fetching stores", error);
+      console.error("Error fetching stores", error);
     }
-};
+  };
 
   const updateQueryParams = (params: Record<string, string | number>) => {
     const newParams = new URLSearchParams(searchParams.toString());
@@ -104,11 +104,11 @@ const CategoriesListPage = () => {
           value={stores.find((option) => option.id === Number(storeId)) || null}
         />
       )}
-      
+
       <div className="my-4">
-          <Link href={'inventory-management/create'} className="bg-green-500 py-2 px-4 mr-4 rounded-md text-white">+ Create</Link>
-        </div>
-      
+        <Link href={'inventory-management/create'} className="bg-green-500 py-2 px-4 mr-4 rounded-md text-white">+ Create</Link>
+      </div>
+
       <SearchInput value={search} onChange={handleSearch} placeholder="Search by name..." />
 
       <div className="overflow-x-auto bg-white shadow-md rounded-lg">
@@ -137,7 +137,6 @@ const CategoriesListPage = () => {
                   {user?.role === 1 && (
                     <td className="p-3">
                       <ToastContainer position="top-center" />
-                      <button className="bg-blue-500 py-1 px-4 mr-2 rounded-md text-white" onClick={() => router.push(`inventory-management/${stock.id}`)}>Edit</button>
                       <DeleteConfirmation
                         apiUrl="/stock/delete"
                         itemId={stock.id}
@@ -145,7 +144,7 @@ const CategoriesListPage = () => {
                       />
                     </td>
                   )}
-                  
+
                 </tr>
               ))
             ) : (

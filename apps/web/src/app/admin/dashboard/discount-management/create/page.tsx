@@ -11,19 +11,15 @@ import { Product } from "@/features/types/product";
 import DiscountType from "@/features/types/discountType";
 import Store from "@/features/types/store";
 import Select from "react-select";
+import { useSelector } from "react-redux";
 
-const createDiscount = () => {
+const CreateDiscount = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [stores, setStores] = useState<Store[]>([]);
     const [discountType, setDiscountType] = useState<DiscountType[]>([]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-
-    useEffect(() => {
-        fetchProducts();
-        fetchStores();
-        fetchDiscountType();
-    }, []);
+    const user = useSelector((state: any) => state.auth.user);
 
     const fetchProducts = async () => {
         try {
@@ -52,6 +48,15 @@ const createDiscount = () => {
         }
     };
 
+    useEffect(() => {
+        fetchProducts();
+        fetchStores();
+        fetchDiscountType();
+        if (user.store) {
+            formik.setFieldValue('store_id', user.store)
+        }
+    }, []);
+
     const formik = useFormik({
         initialValues: initialValues,
         validationSchema: validationSchema,
@@ -78,7 +83,7 @@ const createDiscount = () => {
             <button className="bg-gray-400 text-white py-1 px-3 rounded mt-2 mb-[30px]" onClick={() => router.back()}>Back</button>
             <h1 className="text-xl font-bold mb-4">Create Discount</h1>
             <form onSubmit={formik.handleSubmit} className="space-y-4 mx-auto">
-            <div>
+                <div>
                     <label className="block text-sm font-medium">Discount Type</label>
                     <Select
                         options={discountType}
@@ -93,10 +98,10 @@ const createDiscount = () => {
                         <p className="text-red-500 text-sm">{formik.errors.discount_type_id}</p>
                     )}
                 </div>
-                
+
                 <div>
                     <label className="block text-sm font-medium">Discount Name</label>
-                    <input type="text" name="name" className="w-full border p-2 rounded" value={formik.values.name} onChange={formik.handleChange}/>
+                    <input type="text" name="name" className="w-full border p-2 rounded" value={formik.values.name} onChange={formik.handleChange} />
                     {formik.touched.name && formik.errors.name && (
                         <p className="text-red-500 text-sm">{formik.errors.name}</p>
                     )}
@@ -116,10 +121,11 @@ const createDiscount = () => {
                         options={stores}
                         placeholder="Select Store"
                         name="store_id"
+                        isDisabled={user?.store}
                         getOptionLabel={(e) => e.name}
                         getOptionValue={(e) => String(e.id)}
                         onChange={(selectedOption) => formik.setFieldValue("store_id", Number(selectedOption?.id))}
-                        value={stores.find((option) => option.id === Number(formik.values.store_id)) || null}
+                        value={stores.find((option) => option.id === Number(formik.values.store_id)) || user?.store || null}
                     />
                     {formik.touched.store_id && formik.errors.store_id && (
                         <p className="text-red-500 text-sm">{formik.errors.store_id}</p>
@@ -198,4 +204,4 @@ const createDiscount = () => {
     );
 };
 
-export default createDiscount;
+export default CreateDiscount;

@@ -1,16 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import api from "@/lib/axios";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from 'next/navigation';
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import "leaflet-control-geocoder";
 import { initialValues, validationSchema } from "@/features/schema/storeSchema";
+import { useMap, useMapEvents } from "react-leaflet"; // Fix disini!
+
+const MapContainer = dynamic(() => import("react-leaflet").then(mod => mod.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import("react-leaflet").then(mod => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import("react-leaflet").then(mod => mod.Marker), { ssr: false });
 
 const StoreForm = () => {
     const [loading, setLoading] = useState(false);
