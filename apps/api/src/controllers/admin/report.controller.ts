@@ -1,8 +1,8 @@
 import { Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "@/custom";
 import { PrismaClient } from "@prisma/client";
-import { getAllData, perCategory, perProduct } from "@/services/report.service";
-import { detailJurnal, jurnalStock } from "@/services/reportStock.service";
+import { getAllData, perCategory, perProduct } from "../services/report.service";
+import { detailJurnal, jurnalStock } from "../services/reportStock.service";
 const prisma = new PrismaClient();
 
 export class ReportController {
