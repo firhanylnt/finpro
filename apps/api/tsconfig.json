@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES2015",
-    "module": "NodeNext",
+    "module": "CommonJS",
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "noEmitOnError": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "nodenext",
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {

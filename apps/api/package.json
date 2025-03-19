@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "cross-env NODE_ENV=development ts-node-dev -r tsconfig-paths/register src/index.ts",
-    "build": "tsc && tsc-alias && node -r tsconfig-paths/register dist/index.js",
+    "build": "tsc && tsc-alias",
     "vercel-build": "mkdir -p dist && npx prisma generate && npm run build",
     "serve": "cross-env NODE_ENV=production node -r tsconfig-paths/register dist/index.js",
     "start": "cross-env NODE_ENV=production node -r tsconfig-paths/register dist/index.js",
@@ -22,7 +22,7 @@
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "date-fns": "^4.1.0",
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.4.7",
     "dotenv-cli": "^8.0.0",
     "express": "^4.18.2",
     "express-validator": "^7.2.1",
