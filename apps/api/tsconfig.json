@@ -1,11 +1,22 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "outDir": "dist",
     "rootDir": "src",
     "moduleResolution": "node",
-    "target": "es6",
-    "module": "commonjs"
+    "target": "ES6",
+    "module": "CommonJS",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "strictNullChecks": true
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
