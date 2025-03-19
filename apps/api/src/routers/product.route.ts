@@ -1,5 +1,5 @@
 
-import { ProductController } from '@/controllers/admin/product.controller';
+import { ProductController } from '../controllers/admin/product.controller';
 import { VerifyToken, AdminGuard } from "../middlewares/authMiddleware";
 import { Router } from 'express';
 import upload from '@/middlewares/uploadMiddleware';

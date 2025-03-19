@@ -1,4 +1,4 @@
-import { OrderController } from '@/controllers/order.controller';
+import { OrderController } from '../controllers/order.controller';
 import { VerifyToken, AdminGuard } from '../middlewares/authMiddleware';
 import { Router } from 'express';
 

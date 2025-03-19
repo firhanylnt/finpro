@@ -1,5 +1,5 @@
 
-import { ProductCategoryController } from '@/controllers/admin/productCategory.controller';
+import { ProductCategoryController } from '../controllers/admin/productCategory.controller';
 import { VerifyToken, AdminGuard } from "../middlewares/authMiddleware";
 import { Router } from 'express';
 

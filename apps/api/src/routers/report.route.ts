@@ -1,5 +1,5 @@
 
-import { ReportController } from '@/controllers/admin/report.controller';
+import { ReportController } from '../controllers/admin/report.controller';
 import { Router } from 'express';
 
 export class ReportRouter {

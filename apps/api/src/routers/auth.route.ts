@@ -1,5 +1,5 @@
 
-import { AuthController } from '@/controllers/admin/auth.controller';
+import { AuthController } from '../controllers/admin/auth.controller';
 import { Router } from 'express';
 import { LoginValidation } from "../middlewares/validations/auth.validation";
 

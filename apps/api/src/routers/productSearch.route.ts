@@ -1,5 +1,5 @@
 
-import { ProductSearchController } from '@/controllers/user/product.controller';
+import { ProductSearchController } from '../controllers/user/product.controller';
 import { Router } from 'express';
 
 export class ProductSearchRouter {
