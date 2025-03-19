@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-// import cloudinary from '@/cloudinary';
-const cloudinary = require("@/cloudinary");
+import cloudinary from "../cloudinary";
 const prisma = new PrismaClient();
 
 export const createProduct = async (req: any) => {
