@@ -1,5 +1,5 @@
 
-import { StockController } from '@/controllers/admin/stock.controller';
+import { StockController } from '../controllers/admin/stock.controller';
 import { VerifyToken, AdminGuard } from "../middlewares/authMiddleware";
 import { Router } from 'express';
 

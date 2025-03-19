@@ -1,4 +1,4 @@
-import { CartController } from '@/controllers/cart.controller';
+import { CartController } from '../controllers/cart.controller';
 import { VerifyToken, AdminGuard } from '../middlewares/authMiddleware';
 import { Router } from 'express';
 

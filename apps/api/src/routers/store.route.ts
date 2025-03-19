@@ -1,7 +1,7 @@
 
 import { VerifyToken, AdminGuard } from "../middlewares/authMiddleware";
 import { Router } from 'express';
-import { StoreController } from '@/controllers/admin/store.controller';
+import { StoreController } from '../controllers/admin/store.controller';
 
 export class StoreRouter {
   private router: Router;

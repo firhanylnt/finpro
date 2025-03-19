@@ -1,5 +1,5 @@
 
-import { UsersController } from '@/controllers/admin/users.controller';
+import { UsersController } from '../controllers/admin/users.controller';
 import { VerifyToken, AdminGuard } from "../middlewares/authMiddleware";
 import { Router } from 'express';
 import { RegisterValidation, LoginValidation } from "../middlewares/validations/auth.validation";

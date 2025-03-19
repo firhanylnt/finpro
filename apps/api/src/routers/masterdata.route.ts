@@ -1,5 +1,5 @@
 
-import { MasterDataController } from '@/controllers/admin/masterdata.controller';
+import { MasterDataController } from '../controllers/admin/masterdata.controller';
 import { VerifyToken, AdminGuard } from "../middlewares/authMiddleware";
 import { Router } from 'express';
 

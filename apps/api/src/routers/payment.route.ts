@@ -1,4 +1,4 @@
-import { PaymentController } from '@/controllers/payment.controller';
+import { PaymentController } from '../controllers/payment.controller';
 import { VerifyToken, AdminGuard } from '../middlewares/authMiddleware';
 import { Router } from 'express';
 

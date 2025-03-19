@@ -1,5 +1,5 @@
 
-import { DiscountController } from '@/controllers/admin/discount.controller';
+import { DiscountController } from '../controllers/admin/discount.controller';
 import { VerifyToken } from "../middlewares/authMiddleware";
 import { Router } from 'express';
 
