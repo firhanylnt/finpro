@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "@/custom";
-import { createCategory, deleteCategory, getAllData, getById, updateCategory } from "../services/categories.service";
+import { createCategory, deleteCategory, getAllData, getById, updateCategory } from "../../services/categories.service";
 
 export class ProductCategoryController {
 

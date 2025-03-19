@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "@/custom";
 import { PrismaClient } from "@prisma/client";
-import { createAdmin, deleteAdmin, getAllData, getAllDataEndUser, getById, updateAdmin } from "../services/admin.service";
+import { createAdmin, deleteAdmin, getAllData, getAllDataEndUser, getById, updateAdmin } from "../../services/admin.service";
 
 const prisma = new PrismaClient();
 
