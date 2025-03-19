@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "@/custom";
-import { createStock, getAllData, updateStock } from "../services/stock.service";
+import { createStock, getAllData, updateStock } from "../../services/stock.service";
 
 export class StockController {
 
