@@ -19,7 +19,7 @@
     "lint-staged": "^15.1.0",
     "prettier": "^3.1.0",
     "tsc-alias": "^1.8.10",
-    "tsconfig": "*",
+    "tsconfig": "^1.0.0",
     "turbo": "latest"
   },
   "name": "finpro-nextjs-express-prisma",
