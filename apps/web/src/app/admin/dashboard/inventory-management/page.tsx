@@ -32,7 +32,7 @@ const CategoriesListPage = () => {
   useEffect(() => {
     fetchData();
     fetchStores();
-    if (user.store === null) {
+    if (user?.store === null) {
       setDisabled(false);
     }
   }, [searchParams.toString()]);
@@ -92,7 +92,7 @@ const CategoriesListPage = () => {
   return (
     <div className="w-full mx-[30px] mt-[30px]">
       <h1 className="text-2xl mb-6 text-gray-800">Product Stock</h1>
-      {user.store === null && (
+      {user?.store === null && (
         <Select
           options={stores}
           name="store_id"
