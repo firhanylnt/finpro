@@ -1,6 +1,6 @@
 import { Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "@/custom";
-import { getAllData, getById } from "@/services/productSearch.service";
+import { getAllData, getById } from "../services/productSearch.service";
 
 export class ProductSearchController {
 

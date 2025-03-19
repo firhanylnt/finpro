@@ -1,6 +1,6 @@
 import { Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "@/custom";
-import { createDiscount, deleteDiscount, getAllData, getById, updateDiscount } from "@/services/discount.service";
+import { createDiscount, deleteDiscount, getAllData, getById, updateDiscount } from "../services/discount.service";
 
 export class DiscountController {
 

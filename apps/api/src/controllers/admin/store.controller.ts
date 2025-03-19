@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "@/custom";
-import { createStore, deleteStore, getAllData, getById, updateStore } from "@/services/store.service";
+import { createStore, deleteStore, getAllData, getById, updateStore } from "../services/store.service";
 
 export class StoreController {
 
